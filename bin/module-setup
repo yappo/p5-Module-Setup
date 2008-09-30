@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use FindBin;
+use File::Spec;
+use lib File::Spec->catfile($FindBin::Bin, '..', 'lib');
+use Module::Setup;
+
+Module::Setup->new->run;
+
+=head1 NAME
+
+module-setup - creates a skeleton module
+
+=head1 SYNOPSIS
+
+module-setup module
+
+module-setup module flavor
+
+module-setup [options]
+
+Options:
+
+    --flavor=flavor          Create new flavor
+    --flavor-base=base_class Change to flavor class
+                             (default is 'Module::Setup::Flavor::Default')
+    --help                   Show this message
+
+=cut
+
