@@ -55,6 +55,10 @@ sub run {
         $set_has_term = 1;
         $options  = $self->setup_options;
     }
+
+    $options->{flavor}       ||= 'default';
+    $options->{flavor_class} ||= 'Default';
+
     no warnings 'redefine';
     local *has_term = $self->set_has_term_sub if $set_has_term;
 
@@ -115,8 +119,6 @@ sub setup_options {
         help             => sub { pod2usage(1); },
     ) or pod2usage(2);
 
-    $options->{flavor}       ||= 'default';
-    $options->{flavor_class} ||= 'Default';
     $options;
 }
 
