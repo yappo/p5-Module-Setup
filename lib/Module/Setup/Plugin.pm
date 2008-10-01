@@ -44,3 +44,70 @@ sub append_template_file {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Module::Setup::Plugin - Module::Setup Plugin
+
+=head1 Trigger Point
+
+=head2 befor_dump_config $config
+
+config setup L<Module::Setup::Plugin::Config::Basic>
+
+=head2 after_setup_module_attribute
+
+module attribute setup L<Module::Setup::Plugin::VC::SVN>
+
+=head2 after_setup_template_vars
+
+template parameters setup
+
+=head2 append_template_file $template_vars, $module_attribute
+
+add module template file for new module L<Module::Setup::Plugin::VC::Git>
+
+=head2 template_process $options
+
+for template process L<Module::Setup::Plugin::Template>
+
+=head2 check_skeleton_directory
+
+=head1 Plugin Example
+
+~/.module-setup/flavor/myflavor/plugins/plugin.pl
+  package MyFlavor::Plugin;
+  use strict;
+  use warnings;
+  use base 'Module::Setup::Plugin';
+
+  use Path::Class;
+
+  sub register {
+      my($self, ) = @_;
+      $self->add_trigger( check_skeleton_directory => \&check_skeleton_directory );
+  }
+
+  sub check_skeleton_directory {
+      my $self = shift;
+  }
+
+~/.module-setup/flavor/myflavor/config.yaml
+
+  config:
+    plugins:
+      - Config::Basic
+      - VC::SVN
+      - Template
+      - Test::Makefile
+      - +MyFlavor::Plugin
+
+or command option
+
+  $ module-setup --plugin=+MyFlavor::Plugin New::Module
+
+=cut
+
+

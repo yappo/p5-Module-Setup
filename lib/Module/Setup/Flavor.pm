@@ -57,3 +57,9 @@ sub import_template {
 }
 
 1;
+
+=head1 NAME
+
+Module::Setup::Flavor - Module::Setup Flavor
+
+=cut

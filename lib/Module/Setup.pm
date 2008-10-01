@@ -358,7 +358,7 @@ sub create_skeleton {
         config      => $config,
         localtime   => scalar localtime,
     };
-    $self->call_trigger( after_setup_template_vars => $module_attribute);
+    $self->call_trigger( after_setup_template_vars => $template_vars);
 
     my $base = $self->module_setup_dir('flavors', $flavor, 'template');
     for my $path (@files) {
@@ -445,15 +445,38 @@ Module::Setup - a simple module maker "yet another Module::Start(?:er)?"
 
 =head1 SYNOPSIS
 
+simply use
+
   $ module-setup Foo::Bar
+
+make flavor
 
   $ module-setup --init catalyst-action # create a "catalyst actions" flavor
 
+edit for flavor
+
   $ cd ~/.module-setup/flavor/catalyst-action/template && some files edit for catalyst action templates
+
+use flavor
 
   $ module-setup Foo catalyst-action # create to Catalyst::Action::Foo module
 
+redistribute pack for flavor
+
   $ module-setup --pack MyFlavorCatalystAction catalyst-action > MyFlavorCatalystAction.pm
+
+useing redistributed flavor
+
+  $ module-setup --direct --flavor-class=+MyFlavorCatalystAction New::Class
+
+importing redistributed flavor
+
+  $ module-setup --init --flavor-class=+MyFlavorCatalystAction new_flavor
+
+for git
+
+  $ module-setup --plugin=VC::Git Foo::Bar # or edit your ~/.module-setup/flavor/foo/config.yaml
+
 
 =head1 DESCRIPTION
 
@@ -461,13 +484,37 @@ Module::Setup is very simply module start kit.
 
 When the module-setup command is executed first, a necessary template for ~/.module-setup directory is copied.
 
+=head1 What's difference Module::Setup and Module::Starter?
+
+L<Module::Starter> is very useful module. However customize of module template is complex.
+
+If L<Module::Sterter::PBP> is used, do you solve it?
+
+Yes, but switch of two or more templates is complex.
+
+If Module::Setup is used, switch of template flavor is easy.
+
+flavor customized uniquely becomes the form which can be redistributed by "module-setup --pack".
+
+if incorporating Module::Setup in your application, you can make Helper which is well alike of Catalyst::Helper.
+
+=head1 Example For Incorporating
+
+  use Module::Setup;
+  my $pmsetup = Module::Setup->new;
+  local $ENV{MODULE_SETUP_DIR} = '/tmp/module-setup'; # dont use  ~/.module-setup directory
+  my $options = {
+      unset_hash_term => 1, # disable log, using default value for all dialog method
+  };
+  $pmsetup->run($options, [qw/ New::Module foo_flavor /]; # create New::Module module with foo_flavor flavor
+
 =head1 AUTHOR
 
 Kazuhiro Osawa E<lt>ko@yappo.ne.jpE<gt>
 
 =head1 SEE ALSO
 
-L<module-setup>
+L<Module::Setup::Plugin>, <L<module-setup>
 
 this module's base code is pmsetup written by Tatsuhiko Miyagawa.
 
