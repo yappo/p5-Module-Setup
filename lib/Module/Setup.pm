@@ -11,10 +11,10 @@ use Fcntl qw( :mode );
 use File::Basename;
 use File::Find::Rule;
 use File::Path;
-use File::Spec;
 use File::Temp;
 use Getopt::Long;
 use Module::Collect;
+use Path::Class;
 use Pod::Usage;
 use YAML ();
 
@@ -134,9 +134,9 @@ sub plugin_collect {
     my($self, $config) = @_;
 
     my @local_plugins;
-    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('plugins') )->modules };
-    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('flavors', $config->{flavor}, 'plugins') )->modules };
-    my %loaded_local_plugin;;
+    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('plugins')->stringify )->modules };
+    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('flavors', $config->{flavor}, 'plugins')->stringify )->modules };
+    my %loaded_local_plugin;
     for my $local_plugin (@local_plugins) {
         $local_plugin->require;
         if ($local_plugin->package->isa('Module::Setup::Plugin')) {
@@ -180,10 +180,14 @@ sub module_setup_dir {
     my $base = $ENV{MODULE_SETUP_DIR} || do {
         eval { require File::HomeDir };
         my $home = $@ ? $ENV{HOME} : File::HomeDir->my_home;
-        File::Spec->catfile( $home, '.module-setup' );
+        Path::Class::Dir->new( $home, '.module-setup' );
     };
 
-    $base  = File::Spec->catfile( $base, @path ) if @path;
+    if (@path) {
+        my $new_base = Path::Class::Dir->new( $base, @path );
+        $new_base = Path::Class::File->new( $base, @path ) unless -d $base;
+        $base = $new_base;
+    }
     $base;
 }
 
@@ -196,6 +200,7 @@ sub _create_directory {
     my $dir = $opts{dir} || File::Basename::dirname($opts{file});
     unless (-e $dir) {
         $self->log("Creating directory $dir");
+        $dir = $dir->stringify if ref($dir) && $dir->can('stringify');
         File::Path::mkpath($dir, 0, 0777);
     }
 }
@@ -231,12 +236,21 @@ sub install_flavor {
     });
 }
 
+sub write_template {
+    my($self, $options) = @_;
+
+    $self->call_trigger( template_process => $options );
+    $options->{template} = delete $options->{content} unless $options->{template};
+    $options->{dist_path} =~ s/____var-(.+)-var____/$options->{vars}->{$1} || $options->{vars}->{config}->{$1}/eg;
+
+    $self->write_file($options);
+}
+
 sub install_template {
     my($self, $base, $path, $vars, $module_attribute) = @_;
 
-    my $src  = File::Spec->catfile($base, $path);
-    my $dist = File::Spec->catfile(@{ $module_attribute->{dist_path} }, $path);
-    return $self->create_directory( dir => $dist ) if -d $src;
+    my $src  = Path::Class::File->new($base, $path);
+    my $dist = Path::Class::File->new(@{ $module_attribute->{dist_path} }, $path);
 
     my $mode = ( stat $src )[2];
     $mode = sprintf "%03o", S_IMODE($mode);
@@ -245,19 +259,14 @@ sub install_template {
     my $template = do { local $/; <$fh> };
     close $fh;
 
-    my $opts = {
+    my $options = {
         dist_path => $dist,
         template  => $template,
         chmod     => $mode,
         vars      => $vars,
         content   => undef,
     };
-    $self->call_trigger( template_process => $opts );
-    $opts->{template} = delete $opts->{content} unless $opts->{template};
-
-    $opts->{dist_path} =~ s/____var-(.+)-var____/$vars->{$1} || $vars->{config}->{$1}/eg;
-
-    $self->write_file($opts);
+    $self->write_template($options);
 }
 
 sub create_flavor {
@@ -355,8 +364,9 @@ sub create_skeleton {
     for my $path (@files) {
         $self->install_template($base, $path, $template_vars, $module_attribute);
     }
+    $self->call_trigger( append_template_file => $template_vars, $module_attribute);
 
-    File::Spec->catfile( @{ $module_attribute->{dist_path} } );
+    Path::Class::Dir->new( @{ $module_attribute->{dist_path} } );
 }
 
 sub pack_flavor {
@@ -382,7 +392,7 @@ sub pack_flavor {
         }
 
         for my $file (@{ $conf->{files} }) {
-            my $path = File::Spec->catfile($base_path, $file);
+            my $path = Path::Class::File->new($base_path, $file);
 
             if ($conf->{type} eq 'config') {
                 my $data = YAML::LoadFile($path);
