@@ -439,9 +439,11 @@ Module::Setup - a simple module maker "yet another Module::Start(?:er)?"
 
   $ module-setup --init catalyst-action # create a "catalyst actions" flavor
 
-  $ cd ~/.module-setup/catalyst-action && some files edit for catalyst action templates
+  $ cd ~/.module-setup/flavor/catalyst-action/template && some files edit for catalyst action templates
 
   $ module-setup Foo catalyst-action # create to Catalyst::Action::Foo module
+
+  $ module-setup --pack MyFlavorCatalystAction catalyst-action > MyFlavorCatalystAction.pm
 
 =head1 DESCRIPTION
 
@@ -454,6 +456,8 @@ When the module-setup command is executed first, a necessary template for ~/.mod
 Kazuhiro Osawa E<lt>ko@yappo.ne.jpE<gt>
 
 =head1 SEE ALSO
+
+L<module-setup>
 
 this module's base code is pmsetup written by Tatsuhiko Miyagawa.
 
