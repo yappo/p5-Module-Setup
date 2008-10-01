@@ -22,9 +22,12 @@ file: Makefile.PL
 template: |
   use inc::Module::Install;
   name '[% dist %]';
-  all_from 'lib/[% path %]';
+  all_from 'lib/[% module_path %].pm';
 
   # requires '';
+
+  tests 't/*.t';
+  author_tests 'xt';
 
   build_requires 'Test::More';
   use_test_base;
@@ -56,7 +59,7 @@ template: |
   use Test::More;
   eval {
       require Test::Perl::Critic;
-      Test::Perl::Critic->import( -profile => 't/perlcriticrc');
+      Test::Perl::Critic->import( -profile => 'xt/perlcriticrc');
   };
   plan skip_all => "Test::Perl::Critic is not installed." if $@;
   all_critic_ok('lib');
@@ -80,7 +83,7 @@ template: |
   0.01    [% localtime %]
           - original version
 ---
-file: lib/____var-modulepath-var____.pm
+file: lib/____var-module_path-var____.pm
 template: |
   package [% module %];
 
@@ -175,3 +178,9 @@ chmod: 0644
 template: |
   steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
   svk.tagpattern = release-%v
+---
+config:
+  plugins:
+    - SVN
+    - Template
+    - Test::Makefile

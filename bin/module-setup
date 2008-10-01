@@ -14,17 +14,22 @@ module-setup - creates a skeleton module
 
 =head1 SYNOPSIS
 
-module-setup module
+module-setup module_name
 
-module-setup module flavor
+module-setup module_name other_flavor_name
 
 module-setup [options]
 
+module-setup --init new_flavor_name
+
 Options:
 
-    --flavor=flavor          Create new flavor
+    --init                   Create new flavor
+    --flavor=flavor          Change to flavor
+                             (default is 'default')
     --flavor-base=base_class Change to flavor class
                              (default is 'Module::Setup::Flavor::Default')
+    --plugin=plugin_name     add using plugin
     --help                   Show this message
 
 =cut
