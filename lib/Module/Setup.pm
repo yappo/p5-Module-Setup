@@ -170,12 +170,6 @@ sub module_setup_dir {
     $base;
 }
 
-sub class_data {
-    my($self, $class) = @_;
-    local $/;
-    eval "package $class; <DATA>";
-}
-
 sub create_directory {
     my $self = shift;
     $self->_create_directory(@_);
@@ -260,10 +254,7 @@ sub create_flavor {
     Carp::croak "create flavor: $name exists " if -d $self->module_setup_dir('flavors', $name);
     eval " require $class "; Carp::croak $@ if $@;
 
-    my $data = $self->class_data($class);
-    Carp::croak "flavor template class is invalid: $class" unless $data;
-
-    my @template = YAML::Load(join '', $data);
+    my @template = $class->load_data;
     my $config = +{};
     for my $tmpl (@template) {
         if (exists $tmpl->{config} && ref($tmpl->{config}) eq 'HASH') {

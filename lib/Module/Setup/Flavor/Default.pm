@@ -1,7 +1,7 @@
 package Module::Setup::Flavor::Default;
 use strict;
 use warnings;
-
+use base 'Module::Setup::Flavor';
 1;
 
 
