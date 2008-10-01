@@ -26,14 +26,33 @@ sub import_template {
     my @local_template = loader($class);
 
     my %template_index;
+    my $template_config;
     for my $tmpl (@local_template) {
-        $template_index{$tmpl->{file}} = $tmpl;
+        if (exists $tmpl->{file}) {
+            $template_index{'template - '.$tmpl->{file}} = $tmpl;
+        } elsif (exists $tmpl->{plugin}) {
+            $template_index{'plugins - '.$tmpl->{plugin}} = $tmpl;
+        } elsif (exists $tmpl->{config}) {
+            $template_config = $tmpl;
+        }
     }
 
     my @template;
     for my $tmpl (@base_template) {
-        push @template, ($template_index{$tmpl->{file}} || $tmpl);
+        if (exists $tmpl->{file}) {
+            push @template, (delete $template_index{'template - ' . $tmpl->{file}} || $tmpl);
+        } elsif (exists $tmpl->{plugin}) {
+            push @template, (delete $template_index{'plugins - ' . $tmpl->{plugin}} || $tmpl);
+        } elsif (exists $tmpl->{config} && !defined $template_config) {
+            $template_config = $tmpl;
+        }
     }
+
+    for my $tmpl (values %template_index) {
+        push @template, $tmpl;
+    }
+    push @template, $template_config if $template_config;
+
     @template;
 }
 
