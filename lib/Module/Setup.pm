@@ -144,8 +144,8 @@ sub plugin_collect {
     my($self, $config) = @_;
 
     my @local_plugins;
-    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('plugins')->stringify )->modules };
-    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('flavors', $config->{flavor}, 'plugins')->stringify )->modules };
+    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('plugins') )->modules };
+    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('flavors', $config->{flavor}, 'plugins') )->modules };
     my %loaded_local_plugin;
     for my $local_plugin (@local_plugins) {
         $local_plugin->require;

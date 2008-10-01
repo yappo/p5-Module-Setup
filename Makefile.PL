@@ -9,7 +9,7 @@ requires 'File::Find::Rule';
 requires 'File::Path';
 requires 'File::Temp';
 requires 'Getopt::Long';
-requires 'Module::Collect';
+requires 'Module::Collect' => 0.03;
 requires 'Path::Class';
 requires 'Pod::Usage';
 requires 'Scalar::Util';
