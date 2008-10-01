@@ -9,7 +9,7 @@ sub loader {
     my $class = shift;
 
     local $/;
-    my $data = eval "package $class; <DATA>";
+    my $data = eval "package $class; <DATA>"; ## no critic
     Carp::croak "flavor template class is invalid: $class" unless $data;
 
     my @template = YAML::Load(join '', $data);
@@ -19,7 +19,7 @@ sub loader {
 sub import_template {
     my($class, $base_class) = @_;
 
-    eval "require $base_class";
+    eval "require $base_class"; ## no critic
     Carp::croak $@ if $@;
 
     my @base_template  = $base_class->loader;

@@ -60,7 +60,7 @@ sub run {
     $options->{flavor_class} ||= 'Default';
 
     no warnings 'redefine';
-    local *has_term = $self->set_has_term_sub if $set_has_term;
+    local *has_term = $self->set_has_term_sub if $set_has_term; ## no critic
 
     my @argv = defined $argv && ref($argv) eq 'ARRAY' ? @{ $argv } : @ARGV;
 
@@ -79,7 +79,7 @@ sub run {
         return $self->pack_flavor($options);
     }
 
-    local $ENV{MODULE_SETUP_DIR} = File::Temp->newdir if $options->{direct};
+    local $ENV{MODULE_SETUP_DIR} = File::Temp->newdir if $options->{direct}; ## no critic
 
     unless ( -d $self->module_setup_dir('flavors') && -d $self->module_setup_dir('flavors', $options->{flavor}) ) {
         # setup the module-setup directory
@@ -178,7 +178,7 @@ sub load_plugins {
         $pkg = "Module::Setup::Plugin::$pkg" unless $pkg =~ s/^\+//;
 
         unless ($loaded_local_plugin{$pkg}) {
-            eval "require $pkg";
+            eval "require $pkg"; ## no critic
             Carp::croak $@ if $@;
         }
         $loaded_plugin{$pkg} = $pkg->new( context => $self, config => $config );
@@ -211,7 +211,7 @@ sub _create_directory {
     unless (-e $dir) {
         $self->log("Creating directory $dir");
         $dir = $dir->stringify if ref($dir) && $dir->can('stringify');
-        File::Path::mkpath($dir, 0, 0777);
+        File::Path::mkpath($dir, 0, 0777); ## no critic
     }
 }
 
@@ -288,7 +288,7 @@ sub create_flavor {
     $class = "Module::Setup::Flavor::$class" unless $class =~ s/^\+//;
 
     Carp::croak "create flavor: $name exists " if -d $self->module_setup_dir('flavors', $name);
-    eval " require $class "; Carp::croak $@ if $@;
+    eval " require $class "; Carp::croak $@ if $@; ## no critic
 
     my @template = $class->loader;
     my $config = +{};
