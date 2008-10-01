@@ -10,7 +10,7 @@ Module::Setup->new->run;
 
 =head1 NAME
 
-module-setup - creates a skeleton module
+module-setup - create a skeleton module
 
 =head1 SYNOPSIS
 
