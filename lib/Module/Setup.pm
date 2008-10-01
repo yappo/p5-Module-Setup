@@ -37,8 +37,16 @@ sub dialog {
     prompt($msg, $default);
 }
 
+sub _clear_triggers {
+    my $self = shift;
+    # reset triggers # this is bad hack
+    delete $self->{__triggers};
+    delete $self->{_class_trigger_results};
+}
+
 sub run {
     my($self, $options, $argv) = @_;
+    $self->_clear_triggers;
 
     my $set_has_term = 0;
     if (defined $options && ref($options) eq 'HASH') {
@@ -308,9 +316,7 @@ sub create_flavor {
 
     $self->call_trigger( befor_dump_config => $config );
 
-    # reset triggers # this is bad hack
-    delete $self->{__triggers};
-    delete $self->{_class_trigger_results};
+    $self->_clear_triggers;
 
     # save config
     YAML::DumpFile($self->module_setup_dir('flavors', $name, 'config.yaml'), $config);
