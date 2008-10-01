@@ -24,10 +24,14 @@ module-setup --init new_flavor_name
 
 module-setup --pack MyApp::Flavor::Class flavor_name > MyApp/Flavor/Class.pm
 
+module-setup --direct MyApp # use Module::Setup::Flavor::Default
+module-setup --direct --flavor-class=+My::Flavor MyApp
+
 Options:
 
     --init                   Create new flavor
     --pack                   Pack flavor
+    --direct                 unuse flavor directory
     --flavor=flavor          Change to flavor
                              (default is 'default')
     --flavor-base=base_class Change to flavor class

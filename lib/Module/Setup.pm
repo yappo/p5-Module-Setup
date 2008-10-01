@@ -12,6 +12,7 @@ use File::Basename;
 use File::Find::Rule;
 use File::Path;
 use File::Spec;
+use File::Temp;
 use Getopt::Long;
 use Module::Collect;
 use Pod::Usage;
@@ -59,6 +60,8 @@ sub run {
         return $self->pack_flavor($options);
     }
 
+    $ENV{MODULE_SETUP_DIR} = File::Temp->newdir if $options->{direct};
+
     unless ( -d $self->module_setup_dir('flavors') && -d $self->module_setup_dir('flavors', $options->{flavor}) ) {
         # setup the module-setup directory
         $self->create_flavor($options);
@@ -86,6 +89,7 @@ sub setup_options {
     GetOptions(
         'init'           => \($options->{init}),
         'pack'           => \($options->{pack}),
+        'direct'         => \($options->{direct}),
         'flavor=s'       => \($options->{flavor}),
         'flavor-class=s' => \($options->{flavor_class}),
         'plugin=s@'      => \($options->{plugins}),

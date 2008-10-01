@@ -8,6 +8,7 @@ requires 'File::Basename';
 requires 'File::Find::Rule';
 requires 'File::Path';
 requires 'File::Spec';
+requires 'File::Temp';
 requires 'Getopt::Long';
 requires 'Module::Collect';
 requires 'Pod::Usage';
