@@ -11,6 +11,7 @@ requires 'File::Spec';
 requires 'Getopt::Long';
 requires 'Module::Collect';
 requires 'Pod::Usage';
+requires 'Scalar::Util';
 requires 'Template';
 requires 'YAML';
 

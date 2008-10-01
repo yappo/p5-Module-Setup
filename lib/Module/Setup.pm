@@ -17,7 +17,6 @@ use Module::Collect;
 use Pod::Usage;
 use YAML ();
 
-use Data::Dumper;
 
 sub new {
     my $class = shift;
@@ -34,7 +33,7 @@ sub log {
 sub dialog {
     my($self, $msg, $default) = @_;
     return $default unless $self->has_term;
-    prompt($msg, $default);    
+    prompt($msg, $default);
 }
 
 sub run {
@@ -155,7 +154,7 @@ sub load_plugins {
             eval "require $pkg";
             Carp::croak $@ if $@;
         }
-        $loaded_plugin{$pkg} = $pkg->new( config => $config );
+        $loaded_plugin{$pkg} = $pkg->new( context => $self, config => $config );
     }
 }
 
@@ -281,6 +280,27 @@ sub create_flavor {
         $config->{plugins} ||= [];
         push @{ $config->{plugins} }, @{ $options->{plugins} };
     }
+    $config->{plugins} ||= [];
+
+    # load plugins
+    $self->load_plugins(+{
+        %{ $config },
+        %{ $options },
+        plugins => $config->{plugins},
+    });
+
+    # ask author and mail
+    $config->{author} ||= 'Default Name';
+    $config->{author} = $self->dialog("Your name: ", $config->{author});
+
+    $config->{email} ||= 'default {at} example.com';
+    $config->{email} = $self->dialog("Your email: ", $config->{email});
+
+    $self->call_trigger( befor_dump_config => $config );
+
+    # reset triggers # this is bad hack
+    delete $self->{__triggers};
+    delete $self->{_class_trigger_results};
 
     # save config
     YAML::DumpFile($self->module_setup_dir('flavors', $name, 'config.yaml'), $config);
