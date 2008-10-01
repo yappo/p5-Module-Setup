@@ -21,7 +21,7 @@ sub check_skeleton_directory {
     my $dir = Path::Class::Dir->new('.');
     while (my $path = $dir->next) {
         next if $path eq '.' || $path eq '..' || $path eq '.git' || $path eq '.gitignore';
-        system "git add $path";
+        system 'git', 'add', $path;
     }
     !system 'git commit -m "initial commit"' or die $?;
 }
