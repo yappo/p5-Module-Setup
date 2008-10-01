@@ -73,7 +73,22 @@ add module template file for new module L<Module::Setup::Plugin::VC::Git>
 
 for template process L<Module::Setup::Plugin::Template>
 
-=head2 check_skeleton_directory
+=head2 check_skeleton_directory $attributes
+
+  for test L<Module::Setup::Plugin::Test::Makefile>
+
+  $attributes = +{
+      module_attribute => $module_attribute,
+      template_vars    => $template_vars,
+  };
+
+=head2 after_create_skeleton $attributes
+
+aftter create_skeleton
+
+=head2 finalize_create_skeleton $attributes
+
+last trriger of run method
 
 =head1 Plugin Example
 

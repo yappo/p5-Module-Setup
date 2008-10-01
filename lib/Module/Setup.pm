@@ -91,12 +91,15 @@ sub run {
     $self->load_plugins($config);
 
     # create skeleton
-    my $chdir = $self->create_skeleton($config);
-    return unless $chdir;
+    my $attributes = $self->create_skeleton($config);
+    return unless $attributes;
+    $self->call_trigger( after_create_skeleton => $attributes );
 
     # test
-    chdir $chdir;
-    $self->call_trigger('check_skeleton_directory');
+    chdir Path::Class::Dir->new( @{ $attributes->{module_attribute}->{dist_path} } );
+    $self->call_trigger( check_skeleton_directory => $attributes );
+
+    $self->call_trigger( finalize_create_skeleton => $attributes );
 }
 
 sub setup_options {
@@ -374,7 +377,10 @@ sub create_skeleton {
     }
     $self->call_trigger( append_template_file => $template_vars, $module_attribute);
 
-    Path::Class::Dir->new( @{ $module_attribute->{dist_path} } );
+    return +{
+        module_attribute => $module_attribute,
+        template_vars    => $template_vars,
+    };
 }
 
 sub pack_flavor {
