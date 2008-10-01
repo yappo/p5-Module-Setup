@@ -181,6 +181,6 @@ template: |
 config:
   plugins:
     - Config::Basic
-    - SVN
+    - VC::SVN
     - Template
     - Test::Makefile
