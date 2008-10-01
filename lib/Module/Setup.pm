@@ -254,7 +254,7 @@ sub create_flavor {
     Carp::croak "create flavor: $name exists " if -d $self->module_setup_dir('flavors', $name);
     eval " require $class "; Carp::croak $@ if $@;
 
-    my @template = $class->load_data;
+    my @template = $class->loader;
     my $config = +{};
     for my $tmpl (@template) {
         if (exists $tmpl->{config} && ref($tmpl->{config}) eq 'HASH') {

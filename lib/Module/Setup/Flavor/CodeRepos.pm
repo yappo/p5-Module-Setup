@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use base 'Module::Setup::Flavor';
 
-sub load_data {
+sub loader {
     my $class = shift;
-    $class->merge_template('Module::Setup::Flavor::Default');
+    $class->import_template('Module::Setup::Flavor::Default');
 }
 
 1;

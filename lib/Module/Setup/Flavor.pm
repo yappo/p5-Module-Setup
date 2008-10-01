@@ -5,7 +5,7 @@ use warnings;
 use Carp ();
 use YAML ();
 
-sub load_data {
+sub loader {
     my $class = shift;
 
     local $/;
@@ -16,14 +16,14 @@ sub load_data {
     @template;
 }
 
-sub merge_template {
+sub import_template {
     my($class, $base_class) = @_;
 
     eval "require $base_class";
     Carp::croak $@ if $@;
 
-    my @base_template  = $base_class->load_data;
-    my @local_template = load_data($class);
+    my @base_template  = $base_class->loader;
+    my @local_template = loader($class);
 
     my %template_index;
     for my $tmpl (@local_template) {
