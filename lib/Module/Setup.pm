@@ -38,29 +38,36 @@ sub dialog {
 }
 
 sub run {
-    my $self = shift;
+    my($self, $options, $argv) = @_;
 
+    my $set_has_term = 0;
+    if (defined $options && ref($options) eq 'HASH') {
+        $set_has_term = 1 unless $options->{unset_hash_term};
+    } else { 
+        $set_has_term = 1;
+        $options  = $self->setup_options;
+    }
     no warnings 'redefine';
-    local *has_term = $self->set_has_term_sub;;
+    local *has_term = $self->set_has_term_sub if !$set_has_term;
 
-    my $options = $self->setup_options;
+    my @argv = defined $argv && ref($argv) eq 'ARRAY' ? @{ $argv } : @ARGV;
 
     # create flavor
     if ($options->{init}) {
-        $options->{flavor} = shift @ARGV if @ARGV;
+        $options->{flavor} = shift @argv if @argv;
         return $self->create_flavor($options);
     }
 
     # create module
-    $options->{module} = shift @ARGV;
-    $options->{flavor} = shift @ARGV if @ARGV;
+    $options->{module} = shift @argv;
+    $options->{flavor} = shift @argv if @argv;
 
     if ($options->{pack}) {
         #pack flavor template
         return $self->pack_flavor($options);
     }
 
-    $ENV{MODULE_SETUP_DIR} = File::Temp->newdir if $options->{direct};
+    local $ENV{MODULE_SETUP_DIR} = File::Temp->newdir if $options->{direct};
 
     unless ( -d $self->module_setup_dir('flavors') && -d $self->module_setup_dir('flavors', $options->{flavor}) ) {
         # setup the module-setup directory
