@@ -22,9 +22,12 @@ module-setup [options]
 
 module-setup --init new_flavor_name
 
+module-setup --pack MyApp::Flavor::Class flavor_name > MyApp/Flavor/Class.pm
+
 Options:
 
     --init                   Create new flavor
+    --pack                   Pack flavor
     --flavor=flavor          Change to flavor
                              (default is 'default')
     --flavor-base=base_class Change to flavor class

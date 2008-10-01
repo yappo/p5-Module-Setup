@@ -54,6 +54,11 @@ sub run {
     $options->{module} = shift @ARGV;
     $options->{flavor} = shift @ARGV if @ARGV;
 
+    if ($options->{pack}) {
+        #pack flavor template
+        return $self->pack_flavor($options);
+    }
+
     unless ( -d $self->module_setup_dir('flavors') && -d $self->module_setup_dir('flavors', $options->{flavor}) ) {
         # setup the module-setup directory
         $self->create_flavor($options);
@@ -80,6 +85,7 @@ sub setup_options {
     my $options = {};
     GetOptions(
         'init'           => \($options->{init}),
+        'pack'           => \($options->{pack}),
         'flavor=s'       => \($options->{flavor}),
         'flavor-class=s' => \($options->{flavor_class}),
         'plugin=s@'      => \($options->{plugins}),
@@ -224,7 +230,7 @@ sub install_template {
     my $mode = ( stat $src )[2];
     $mode = sprintf "%03o", S_IMODE($mode);
 
-    open my $fh, '<', $src;
+    open my $fh, '<', $src or die "$src: $!";
     my $template = do { local $/; <$fh> };
     close $fh;
 
@@ -297,9 +303,8 @@ sub create_flavor {
     YAML::DumpFile($self->module_setup_dir('flavors', $name, 'config.yaml'), $config);
 }
 
-sub create_skeleton {
+sub _find_flavor_template {
     my($self, $config) = @_;
-    $config ||= +{};
     my $module = $config->{module};
     my $flavor = $config->{flavor};
 
@@ -308,8 +313,19 @@ sub create_skeleton {
     my $flavor_path = $self->module_setup_dir('flavors', $flavor);
     Carp::croak "No such flavor: $flavor" unless -d $flavor_path;
 
-    my @files = File::Find::Rule->new->relative->in( $self->module_setup_dir('flavors', $flavor, 'template') );
+    my @files = File::Find::Rule->new->file->relative->in( $self->module_setup_dir('flavors', $flavor, 'template') );
     Carp::croak "No such flavor template files: $flavor" unless @files;
+    @files;
+}
+
+sub create_skeleton {
+    my($self, $config) = @_;
+    $config ||= +{};
+
+    my @files = $self->_find_flavor_template($config);
+
+    my $module = $config->{module};
+    my $flavor = $config->{flavor};
 
     my @pkg  = split /::/, $module;
     my $module_attribute = +{
@@ -337,6 +353,73 @@ sub create_skeleton {
     }
 
     File::Spec->catfile( @{ $module_attribute->{dist_path} } );
+}
+
+sub pack_flavor {
+    my($self, $config) = @_;
+    my $module = $config->{module};
+    my $flavor = $config->{flavor};
+
+    my @template_files = $self->_find_flavor_template($config);
+
+    my @plugin_files = File::Find::Rule->new->file->relative->in( $self->module_setup_dir('flavors', $flavor, 'plugins') );
+
+    my @template;
+    for my $conf (
+        { type => 'template', files => \@template_files },
+        { type => 'plugins' , files => \@plugin_files },
+        { type => 'config'  , files =>['config.yaml'] },
+    ) {
+        my $base_path;
+        if ($conf->{type} eq 'config') {
+            $base_path = $self->module_setup_dir('flavors', $flavor);
+        } else {
+            $base_path = $self->module_setup_dir('flavors', $flavor, $conf->{type});
+        }
+
+        for my $file (@{ $conf->{files} }) {
+            my $path = File::Spec->catfile($base_path, $file);
+
+            if ($conf->{type} eq 'config') {
+                my $data = YAML::LoadFile($path);
+                push @template, +{
+                    config => $data
+                };
+            } else {
+                open my $fh, '<', $path or die "$path: $!";
+                my $data = do { local $/; <$fh> };
+                close $fh;
+                my $path_name = $conf->{type} eq 'template' ? 'file' : 'plugin';
+                push @template, +{
+                    $path_name => $file,
+                    template   => $data,
+                };
+            }
+        }
+    }
+
+    my $yaml = YAML::Dump(@template);
+    print <<END;
+package $module;
+use strict;
+use warnings;
+use base 'Module::Setup::Flavor';
+1;
+
+=head1
+
+$module - pack from $flavor
+
+=head1 SYNOPSIS
+
+  $ module-setup --init --flavor-class=+$module new_flavor
+
+=cut
+
+__DATA__
+
+$yaml
+END
 }
 
 1;
