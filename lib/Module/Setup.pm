@@ -506,7 +506,7 @@ if incorporating Module::Setup in your application, you can make Helper which is
   my $options = {
       unset_hash_term => 1, # disable log, using default value for all dialog method
   };
-  $pmsetup->run($options, [qw/ New::Module foo_flavor /]; # create New::Module module with foo_flavor flavor
+  $pmsetup->run($options, [qw/ New::Module foo_flavor /]); # create New::Module module with foo_flavor flavor
 
 =head1 AUTHOR
 
