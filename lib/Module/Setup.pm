@@ -473,7 +473,7 @@ redistribute pack for flavor
 
   $ module-setup --pack MyFlavorCatalystAction catalyst-action > MyFlavorCatalystAction.pm
 
-useing redistributed flavor
+using redistributed flavor
 
   $ module-setup --direct --flavor-class=+MyFlavorCatalystAction New::Class
 
