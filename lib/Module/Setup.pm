@@ -48,7 +48,7 @@ sub run {
         $options  = $self->setup_options;
     }
     no warnings 'redefine';
-    local *has_term = $self->set_has_term_sub if !$set_has_term;
+    local *has_term = $self->set_has_term_sub if $set_has_term;
 
     my @argv = defined $argv && ref($argv) eq 'ARRAY' ? @{ $argv } : @ARGV;
 
