@@ -297,13 +297,6 @@ sub create_flavor {
         plugins => $config->{plugins},
     });
 
-    # ask author and mail
-    $config->{author} ||= 'Default Name';
-    $config->{author} = $self->dialog("Your name: ", $config->{author});
-
-    $config->{email} ||= 'default {at} example.com';
-    $config->{email} = $self->dialog("Your email: ", $config->{email});
-
     $self->call_trigger( befor_dump_config => $config );
 
     # reset triggers # this is bad hack

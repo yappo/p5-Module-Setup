@@ -180,6 +180,7 @@ template: |
 ---
 config:
   plugins:
+    - Config::Basic
     - SVN
     - Template
     - Test::Makefile
