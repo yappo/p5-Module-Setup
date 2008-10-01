@@ -4,14 +4,13 @@ use warnings;
 use base 'Module::Setup::Flavor';
 1;
 
-
 =head1
 
 Module::Setup::Flavor::Default - default flavor
 
 =head1 SYNOPSIS
 
-  $ module-setup --flavor=foo # default flavor class is this
+  $ module-setup --init new_flavor # default flavor class is this
 
 =cut
 
