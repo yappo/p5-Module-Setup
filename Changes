@@ -1,4 +1,12 @@
 Revision history for Perl extension Module::Setup
 
+0.02    2008-10-02T11:34:28+09:00
+        - 0.01 is broken code
+          dependence Module::Collect 0.04
+        - pod fix
+        - add plugin trigger point
+          after_create_skeleton
+          finalize_create_skeleton
+
 0.01    2008-10-01T23:46:50+09:00
         - original version
