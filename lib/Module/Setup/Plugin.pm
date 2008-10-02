@@ -78,8 +78,9 @@ for template process L<Module::Setup::Plugin::Template>
   for test L<Module::Setup::Plugin::Test::Makefile>
 
   $attributes = +{
-      module_attribute => $module_attribute,
-      template_vars    => $template_vars,
+      module_attribute => +{ module_attribute },
+      template_vars    => +{ template_vars },
+      instal_files     => +[ install_files ],
   };
 
 =head2 after_create_skeleton $attributes

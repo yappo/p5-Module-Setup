@@ -256,6 +256,7 @@ sub write_template {
     $options->{template} = delete $options->{content} unless $options->{template};
     $options->{dist_path} =~ s/____var-(.+)-var____/$options->{vars}->{$1} || $options->{vars}->{config}->{$1}/eg;
 
+    push @{ $self->{install_files} }, $options->{dist_path};
     $self->write_file($options);
 }
 
@@ -345,6 +346,7 @@ sub _find_flavor_template {
 sub create_skeleton {
     my($self, $config) = @_;
     $config ||= +{};
+    $self->{install_files} = [];
 
     my @files = $self->_find_flavor_template($config);
 
@@ -380,6 +382,7 @@ sub create_skeleton {
     return +{
         module_attribute => $module_attribute,
         template_vars    => $template_vars,
+        install_files    => $self->{install_files},
     };
 }
 
