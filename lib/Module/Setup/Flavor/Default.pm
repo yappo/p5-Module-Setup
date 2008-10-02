@@ -50,6 +50,7 @@ template: |
   all_pod_files_spelling_ok('lib');
   __DATA__
   [% config.author %]
+  [% config.email %]
   [% module %]
 ---
 file: xt/02_perlcritic.t
