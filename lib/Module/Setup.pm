@@ -426,6 +426,7 @@ sub pack_flavor {
         }
     }
 
+    my $eq = '=';
     my $yaml = YAML::Dump(@template);
     print <<END;
 package $module;
@@ -434,15 +435,15 @@ use warnings;
 use base 'Module::Setup::Flavor';
 1;
 
-=head1
+${eq}head1
 
 $module - pack from $flavor
 
-=head1 SYNOPSIS
+${eq}head1 SYNOPSIS
 
   $ module-setup --init --flavor-class=+$module new_flavor
 
-=cut
+${eq}cut
 
 __DATA__
 
