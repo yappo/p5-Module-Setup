@@ -35,7 +35,6 @@ __DATA__
 ---
  file: .gitignore
  template: |
-  Makefile.PL
   cover_db
   META.yml
   Makefile
