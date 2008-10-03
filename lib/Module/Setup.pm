@@ -56,7 +56,7 @@ sub run {
         $options  = $self->setup_options;
     }
 
-    $options->{flavor}       ||= 'default';
+    $options->{flavor}       ||= $self->select_flavour;
     $options->{flavor_class} ||= 'Default';
 
     no warnings 'redefine';
@@ -73,6 +73,7 @@ sub run {
     # create module
     $options->{module} = shift @argv;
     $options->{flavor} = shift @argv if @argv;
+    $options->{flavor} ||= $self->select_flavour;
 
     if ($options->{pack}) {
         #pack flavor template
@@ -454,6 +455,37 @@ $yaml
 END
 }
 
+sub select_flavour {
+    my $self     = shift;
+    return 'default' unless -d $self->module_setup_dir('flavors');
+
+    my $flavours = $self->_collect_flavours;
+    $self->_show_flavours_list($flavours);
+
+    my $selected = prompt( "Select flavour:", 1 );
+    $flavours->[ $selected - 1 ] || 'default';
+}
+
+sub _collect_flavours {
+    my $self         = shift;
+    my $flavours_dir = $self->module_setup_dir('flavors');
+    my $flavours     = [];
+    for my $flavour ( $flavours_dir->children ) {
+        if ( $flavour->is_dir ) {
+            my $flavour_name = pop @{ $flavour->{dirs} };
+            push @$flavours, $flavour_name;
+        }
+    }
+    $flavours;
+}
+
+sub _show_flavours_list {
+    my ( $self, $flavours ) = @_;
+    for ( 1 .. @$flavours ) {
+        my $flavour = $flavours->[ $_ - 1 ];
+        print sprintf "[%d]: %s", $_, $flavour . "\n";
+    }
+}
 1;
 __END__
 
