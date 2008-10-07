@@ -460,36 +460,24 @@ END
 }
 
 sub select_flavor {
-    my $self     = shift;
+    my $self = shift;
     return 'default' unless -d $self->module_setup_dir('flavors');
 
-    my $flavors = $self->_collect_flavors;
-    $self->_show_flavors_list($flavors);
+    my $num = 1;
+    my @flavors;
+    for my $flavor ( $self->module_setup_dir('flavors')->children ) {
+        next unless $flavor->is_dir;
 
-    my $selected = $self->dialog( 'Select flavor:', 1 );
-    $flavors->[ $selected - 1 ] || 'default';
-}
+        my $name = $flavor->dir_list(-1);
+        push @flavors, $name;
 
-sub _collect_flavors {
-    my $self         = shift;
-    my $flavors_dir = $self->module_setup_dir('flavors');
-    my $flavors     = [];
-    for my $flavor ( $flavors_dir->children ) {
-        if ( $flavor->is_dir ) {
-            my $flavor_name = pop @{ $flavor->{dirs} };
-            push @$flavors, $flavor_name;
-        }
+        $self->log( sprintf "[%d]: %s", $num++, $name );
     }
-    $flavors;
+
+    my $selected = $self->dialog( 'Select flavor:', 1 ) || 1;
+    $flavors[ $selected - 1 ] || 'default';
 }
 
-sub _show_flavors_list {
-    my ( $self, $flavors ) = @_;
-    for ( 1 .. @$flavors ) {
-        my $flavor = $flavors->[ $_ - 1 ];
-        print sprintf "[%d]: %s", $_, $flavor . "\n";
-    }
-}
 1;
 __END__
 
