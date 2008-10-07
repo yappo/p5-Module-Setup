@@ -29,15 +29,15 @@ module-setup --direct --flavor-class=+My::Flavor MyApp
 
 Options:
 
-    --init                   Create new flavor
-    --pack                   Pack flavor
-    --direct                 unuse flavor directory
-    --flavor=flavor          Change to flavor
-                             (default is 'default')
-    --flavor-base=base_class Change to flavor class
-                             (default is 'Module::Setup::Flavor::Default')
-    --plugin=plugin_name     add using plugin
-    --help                   Show this message
+    --init                     Create new flavor
+    --pack                     Pack flavor
+    --direct                   unuse flavor directory
+    --flavor=flavor            Change to flavor
+                                   (default is 'default')
+    --flavor-class=base_class  Change to flavor class
+                                   (default is 'Module::Setup::Flavor::Default')
+    --plugin=plugin_name       add using plugin
+    --help                     Show this message
 
 =cut
 
