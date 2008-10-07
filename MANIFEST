@@ -31,3 +31,5 @@ MANIFEST			This list of files
 META.yml
 README
 t/00_compile.t
+t/020_run/init.t
+t/020_run/simple.t
