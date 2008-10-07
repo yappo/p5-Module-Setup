@@ -568,7 +568,7 @@ Kazuhiro Osawa E<lt>ko@yappo.ne.jpE<gt>
 
 =head1 SEE ALSO
 
-L<Module::Setup::Plugin>, <L<module-setup>
+L<Module::Setup::Plugin>, L<module-setup>
 
 this module's base code is pmsetup written by Tatsuhiko Miyagawa.
 
