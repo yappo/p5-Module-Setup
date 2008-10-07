@@ -56,7 +56,7 @@ sub run {
         $options  = $self->setup_options;
     }
 
-    $options->{flavor}       ||= $self->select_flavour;
+    $options->{flavor}       ||= $self->select_flavor;
     $options->{flavor_class} ||= 'Default';
 
     no warnings 'redefine';
@@ -73,7 +73,7 @@ sub run {
     # create module
     $options->{module} = shift @argv;
     $options->{flavor} = shift @argv if @argv;
-    $options->{flavor} ||= $self->select_flavour;
+    $options->{flavor} ||= $self->select_flavor;
 
     if ($options->{pack}) {
         #pack flavor template
@@ -455,35 +455,35 @@ $yaml
 END
 }
 
-sub select_flavour {
+sub select_flavor {
     my $self     = shift;
     return 'default' unless -d $self->module_setup_dir('flavors');
 
-    my $flavours = $self->_collect_flavours;
-    $self->_show_flavours_list($flavours);
+    my $flavors = $self->_collect_flavors;
+    $self->_show_flavors_list($flavors);
 
-    my $selected = prompt( "Select flavour:", 1 );
-    $flavours->[ $selected - 1 ] || 'default';
+    my $selected = prompt( "Select flavor:", 1 );
+    $flavors->[ $selected - 1 ] || 'default';
 }
 
-sub _collect_flavours {
+sub _collect_flavors {
     my $self         = shift;
-    my $flavours_dir = $self->module_setup_dir('flavors');
-    my $flavours     = [];
-    for my $flavour ( $flavours_dir->children ) {
-        if ( $flavour->is_dir ) {
-            my $flavour_name = pop @{ $flavour->{dirs} };
-            push @$flavours, $flavour_name;
+    my $flavors_dir = $self->module_setup_dir('flavors');
+    my $flavors     = [];
+    for my $flavor ( $flavors_dir->children ) {
+        if ( $flavor->is_dir ) {
+            my $flavor_name = pop @{ $flavor->{dirs} };
+            push @$flavors, $flavor_name;
         }
     }
-    $flavours;
+    $flavors;
 }
 
-sub _show_flavours_list {
-    my ( $self, $flavours ) = @_;
-    for ( 1 .. @$flavours ) {
-        my $flavour = $flavours->[ $_ - 1 ];
-        print sprintf "[%d]: %s", $_, $flavour . "\n";
+sub _show_flavors_list {
+    my ( $self, $flavors ) = @_;
+    for ( 1 .. @$flavors ) {
+        my $flavor = $flavors->[ $_ - 1 ];
+        print sprintf "[%d]: %s", $_, $flavor . "\n";
     }
 }
 1;
