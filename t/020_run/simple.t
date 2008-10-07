@@ -9,14 +9,16 @@ use Module::Setup;
 
 plan tests => 6 * blocks;
 
+my %dir_cache;
+my $dir_count = 0;
 run {
     my $block = shift;
 
-    local $ENV{MODULE_SETUP_DIR} = File::Temp->newdir;
+    local $ENV{MODULE_SETUP_DIR} = $dir_cache{$dir_count++} = File::Temp->newdir;
 
     my $msetup = Module::Setup->new;
 
-    my $target = File::Temp->newdir;
+    my $target = $dir_cache{$dir_count++} = File::Temp->newdir;
     my $options = {
         unset_hash_term => 1,
         target          => $target,
