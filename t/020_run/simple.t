@@ -29,7 +29,9 @@ run {
         return 'n' if $msg =~ /Subversion friendly\?/i;
         return $default;
     };
-    $msetup->run($options, [ $block->module ]);
+    my $args = [ $block->module ];
+    push @{ $args }, $block->flavor if $block->flavor;
+    $msetup->run($options, $args);
 
     ok -d Path::Class::Dir->new( $target, $block->create_dir );
     ok -d Path::Class::Dir->new( $target, $block->create_dir, 't' );
@@ -63,3 +65,10 @@ __END__
  - Foo
  - Bar
  - Baz_Bla.pm
+
+===
+--- module: Foo
+--- flavor: flavor
+--- create_dir: Foo
+--- libs yaml
+ - Foo.pm
