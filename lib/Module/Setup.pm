@@ -56,17 +56,17 @@ sub run {
         $options  = $self->setup_options;
     }
 
-    $options->{flavor}       ||= $self->select_flavor;
-    $options->{flavor_class} ||= 'Default';
-
     no warnings 'redefine';
     local *has_term = $self->set_has_term_sub if $set_has_term; ## no critic
 
     my @argv = defined $argv && ref($argv) eq 'ARRAY' ? @{ $argv } : @ARGV;
 
+    $options->{flavor_class} ||= 'Default';
+
     # create flavor
     if ($options->{init}) {
-        $options->{flavor} = shift @argv if @argv;
+        $options->{flavor}   = shift @argv if @argv;
+        $options->{flavor} ||= 'default';
         return $self->create_flavor($options);
     }
 
