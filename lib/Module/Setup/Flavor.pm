@@ -5,15 +5,18 @@ use warnings;
 use Carp ();
 use YAML ();
 
+my %data_cache;
 sub loader {
     my $class = shift;
 
-    local $/;
-    my $data = eval "package $class; <DATA>"; ## no critic
-    Carp::croak "flavor template class is invalid: $class" unless $data;
+    @{ $data_cache{$class} ||= do {
+        local $/;
+        my $data = eval "package $class; <DATA>"; ## no critic
+        Carp::croak "flavor template class is invalid: $class" unless $data;
 
-    my @template = YAML::Load(join '', $data);
-    @template;
+        my @template = YAML::Load(join '', $data);
+        \@template;
+    } };
 }
 
 sub import_template {
