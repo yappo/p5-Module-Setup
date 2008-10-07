@@ -85,11 +85,11 @@ for template process L<Module::Setup::Plugin::Template>
 
 =head2 after_create_skeleton $attributes
 
-aftter create_skeleton
+after create_skeleton
 
 =head2 finalize_create_skeleton $attributes
 
-last trriger of run method
+last trigger of run method
 
 =head1 Plugin Example
 
