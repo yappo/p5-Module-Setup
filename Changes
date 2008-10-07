@@ -1,5 +1,12 @@
 Revision history for Perl extension Module::Setup
 
+0.03    2008-10-07T20:01:05+09:00
+        - add flavor select option (core)
+        - add dependence to Module::Install::AuthorTests for Flavor::Default franck++
+        - add tests
+        - fixed spell test in Flavor::Default
+        - fixed Makefile.PL is ignored in .gitignore (Plugin::VC::Git)
+
 0.02    2008-10-02T11:34:28+09:00
         - 0.01 is broken code
           dependence Module::Collect 0.04
