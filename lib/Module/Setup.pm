@@ -466,7 +466,7 @@ sub select_flavor {
     my $flavors = $self->_collect_flavors;
     $self->_show_flavors_list($flavors);
 
-    my $selected = prompt( "Select flavor:", 1 );
+    my $selected = $self->dialog( 'Select flavor:', 1 );
     $flavors->[ $selected - 1 ] || 'default';
 }
 
