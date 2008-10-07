@@ -116,6 +116,7 @@ sub setup_options {
         'flavor=s'       => \($options->{flavor}),
         'flavor-class=s' => \($options->{flavor_class}),
         'plugin=s@'      => \($options->{plugins}),
+        'target'         => \($options->{target}),
         version          => sub {
             print "module-setup v$VERSION\n";
             exit 1;
@@ -361,6 +362,9 @@ sub create_skeleton {
         dist_name => join('-', @pkg),
         dist_path => [ join('-', @pkg) ],
     };
+    if (exists $config->{target} && $config->{target}) {
+        unshift @{ $module_attribute->{dist_path} }, $config->{target};
+    }
     $self->call_trigger( after_setup_module_attribute => $module_attribute);
 
     $self->create_directory( dir => $module_attribute->{dist_name} );

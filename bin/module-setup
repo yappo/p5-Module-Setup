@@ -32,6 +32,7 @@ Options:
     --init                     Create new flavor
     --pack                     Pack flavor
     --direct                   unuse flavor directory
+    --target=dir               set the target directory for skeleton
     --flavor=flavor            Change to flavor
                                    (default is 'default')
     --flavor-class=base_class  Change to flavor class
