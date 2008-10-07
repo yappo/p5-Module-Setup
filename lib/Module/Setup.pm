@@ -367,7 +367,7 @@ sub create_skeleton {
     }
     $self->call_trigger( after_setup_module_attribute => $module_attribute);
 
-    $self->create_directory( dir => $module_attribute->{dist_name} );
+    $self->create_directory( dir => Path::Class::Dir->new(@{ $module_attribute->{dist_path} }) );
 
     my $template_vars = {
         module      => $module_attribute->{module},
