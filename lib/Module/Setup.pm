@@ -18,22 +18,20 @@ use Path::Class;
 use Pod::Usage;
 use YAML ();
 
+our $HAS_TERM;
 
 sub new {
     my $class = shift;
     bless {}, $class;
 }
 
-sub has_term { 0 }
-sub set_has_term_sub { sub { 1 } }
-sub unset_has_term_sub { sub { 0 } }
 sub log {
     my($self, $msg) = @_;
-    print STDERR "$msg\n" if $self->has_term;
+    print STDERR "$msg\n" if $HAS_TERM;
 }
 sub dialog {
     my($self, $msg, $default) = @_;
-    return $default unless $self->has_term;
+    return $default unless $HAS_TERM;
     prompt($msg, $default);
 }
 
@@ -48,17 +46,7 @@ sub run {
     my($self, $options, $argv) = @_;
     $self->_clear_triggers;
 
-    my $set_has_term = 0;
-    if (defined $options && ref($options) eq 'HASH') {
-        $set_has_term = 1 unless $options->{unset_hash_term};
-    } else { 
-        $set_has_term = 1;
-        $options  = $self->setup_options;
-    }
-
-    no warnings 'redefine';
-    local *has_term = $self->set_has_term_sub if $set_has_term; ## no critic
-
+    $options = $self->setup_options unless defined $options && ref($options) eq 'HASH';
     my @argv = defined $argv && ref($argv) eq 'ARRAY' ? @{ $argv } : @ARGV;
 
     $options->{flavor_class} ||= 'Default';
@@ -546,7 +534,7 @@ if incorporating Module::Setup in your application, you can make Helper which is
   my $pmsetup = Module::Setup->new;
   local $ENV{MODULE_SETUP_DIR} = '/tmp/module-setup'; # dont use  ~/.module-setup directory
   my $options = {
-      unset_hash_term => 1, # disable log, using default value for all dialog method
+      # see setup_options method
   };
   $pmsetup->run($options, [qw/ New::Module foo_flavor /]); # create New::Module module with foo_flavor flavor
 

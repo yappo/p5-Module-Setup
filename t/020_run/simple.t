@@ -20,8 +20,7 @@ run {
 
     my $target = $dir_cache{$dir_count++} = File::Temp->newdir;
     my $options = {
-        unset_hash_term => 1,
-        target          => $target,
+        target => $target,
     };
 
     no warnings 'redefine';

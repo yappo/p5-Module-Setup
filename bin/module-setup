@@ -6,6 +6,7 @@ use Path::Class;
 use lib Path::Class::Dir->new($FindBin::Bin, '..', 'lib')->stringify;
 use Module::Setup;
 
+$Module::Setup::HAS_TERM = 1;
 Module::Setup->new->run;
 
 =head1 NAME

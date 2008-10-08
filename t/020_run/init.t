@@ -17,9 +17,8 @@ run {
     my $msetup = Module::Setup->new;
 
     my $options = {
-        unset_hash_term => 1,
-        flavor_class    => $block->flavor_class,
-        init            => 1,
+        flavor_class => $block->flavor_class,
+        init         => 1,
     };
     $msetup->run($options, [ $block->flavor ]);
 
