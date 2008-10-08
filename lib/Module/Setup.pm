@@ -129,7 +129,7 @@ sub load_config {
     my @option_plugins = @{ delete $options->{plugins} };
 
     my $config = YAML::LoadFile( $self->config_path($options->{flavor}) );
-        $config = +{
+    $config = +{
         %{ $config },
         %{ $options },
     };
