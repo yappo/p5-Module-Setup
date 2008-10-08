@@ -76,7 +76,7 @@ sub run {
     $self->{module_setup_dir} ||= $options->{module_setup_dir};
     $self->{module_setup_dir}   = File::Temp->newdir if $options->{direct};
 
-    unless ( -d $self->module_setup_dir('flavors') && -d $self->module_setup_dir('flavors', $options->{flavor}) ) {
+    unless ( -d $self->flavors_dir && -d $self->flavors_dir($options->{flavor}) ) {
         # setup the module-setup directory
         $self->create_flavor($options);
         $self->_create_directory( dir => $self->module_setup_dir('plugins') );
@@ -128,7 +128,7 @@ sub load_config {
     $options->{plugins} ||= [];
     my @option_plugins = @{ delete $options->{plugins} };
 
-    my $config = YAML::LoadFile( $self->module_setup_dir('flavors', $options->{flavor}, 'config.yaml') );
+    my $config = YAML::LoadFile( $self->config_path($options->{flavor}) );
         $config = +{
         %{ $config },
         %{ $options },
@@ -145,7 +145,7 @@ sub plugin_collect {
 
     my @local_plugins;
     push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('plugins') )->modules };
-    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('flavors', $config->{flavor}, 'plugins') )->modules };
+    push @local_plugins, @{ Module::Collect->new( path => $self->plugins_dir($config->{flavor}) )->modules };
     my %loaded_local_plugin;
     for my $local_plugin (@local_plugins) {
         $local_plugin->require;
@@ -200,6 +200,20 @@ sub module_setup_dir {
     }
     $base;
 }
+sub flavors_dir { shift->module_setup_dir( 'flavors', @_ ); }
+sub plugins_dir {
+    my($self, $name, @path) = @_;
+    $self->module_setup_dir( 'flavors', $name, 'plugins', @path );
+}
+sub template_dir {
+    my($self, $name, @path) = @_;
+    $self->module_setup_dir( 'flavors', $name, 'template', @path );
+}
+sub config_path {
+    my($self, $name) = @_;
+    $self->module_setup_dir( 'flavors', $name, 'config.yaml' );
+}
+
 
 sub create_directory {
     my $self = shift;
@@ -238,8 +252,8 @@ sub install_flavor {
     my($self, $name, $tmpl) = @_;
 
     my $path = (exists $tmpl->{plugin} && $tmpl->{plugin}) ?
-        $self->module_setup_dir( 'flavors', $name, 'plugins', $tmpl->{plugin} ) :
-            $self->module_setup_dir( 'flavors', $name, 'template', $tmpl->{file} );
+        $self->plugins_dir( $name => $tmpl->{plugin} ) :
+            $self->template_dir( $name => $tmpl->{file} );
     $self->write_file(+{
         dist_path => $path,
         %{ $tmpl },
@@ -288,7 +302,7 @@ sub create_flavor {
 
     $class = "Module::Setup::Flavor::$class" unless $class =~ s/^\+//;
 
-    Carp::croak "create flavor: $name exists " if -d $self->module_setup_dir('flavors', $name);
+    Carp::croak "create flavor: $name exists " if -d $self->flavors_dir($name);
     eval " require $class "; Carp::croak $@ if $@; ## no critic
 
     my @template = $class->loader;
@@ -302,7 +316,7 @@ sub create_flavor {
     }
 
     # plugins
-    $self->_create_directory( dir => $self->module_setup_dir('flavors', $name, 'plugins') );
+    $self->_create_directory( dir => $self->plugins_dir($name) );
 
     if (exists $options->{plugins} && $options->{plugins} && @{ $options->{plugins} }) {
         $config->{plugins} ||= [];
@@ -322,7 +336,7 @@ sub create_flavor {
     $self->_clear_triggers;
 
     # save config
-    YAML::DumpFile($self->module_setup_dir('flavors', $name, 'config.yaml'), $config);
+    YAML::DumpFile($self->config_path($name), $config);
 }
 
 sub _find_flavor_template {
@@ -332,10 +346,10 @@ sub _find_flavor_template {
 
     Carp::croak "module name is required" unless $module;
 
-    my $flavor_path = $self->module_setup_dir('flavors', $flavor);
+    my $flavor_path = $self->flavors_dir($flavor);
     Carp::croak "No such flavor: $flavor" unless -d $flavor_path;
 
-    my @files = File::Find::Rule->new->file->relative->in( $self->module_setup_dir('flavors', $flavor, 'template') );
+    my @files = File::Find::Rule->new->file->relative->in( $self->template_dir($flavor) );
     Carp::croak "No such flavor template files: $flavor" unless @files;
     @files;
 }
@@ -373,7 +387,7 @@ sub create_skeleton {
     };
     $self->call_trigger( after_setup_template_vars => $template_vars);
 
-    my $base = $self->module_setup_dir('flavors', $flavor, 'template');
+    my $base = $self->template_dir($flavor);
     for my $path (@files) {
         $self->install_template($base, $path, $template_vars, $module_attribute);
     }
@@ -393,7 +407,7 @@ sub pack_flavor {
 
     my @template_files = $self->_find_flavor_template($config);
 
-    my @plugin_files = File::Find::Rule->new->file->relative->in( $self->module_setup_dir('flavors', $flavor, 'plugins') );
+    my @plugin_files = File::Find::Rule->new->file->relative->in( $self->plugins_dir($flavor) );
 
     my @template;
     for my $conf (
@@ -459,7 +473,7 @@ sub select_flavor {
     return 'default' unless -d $self->module_setup_dir('flavors');
 
     my @flavors;
-    for my $flavor ( $self->module_setup_dir('flavors')->children ) {
+    for my $flavor ( $self->flavors_dir->children ) {
         next unless $flavor->is_dir;
         my $name = $flavor->dir_list(-1);
         ($name eq 'default') ? unshift @flavors, $name :  push @flavors, $name;
