@@ -46,7 +46,7 @@ sub run {
     my($self, $options, $argv) = @_;
     $self->_clear_triggers;
 
-    $options = $self->setup_options unless defined $options && ref($options) eq 'HASH';
+    $options ||= $self->setup_options;
     my @argv = defined $argv && ref($argv) eq 'ARRAY' ? @{ $argv } : @ARGV;
 
     $options->{flavor_class} ||= 'Default';
