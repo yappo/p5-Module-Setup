@@ -68,7 +68,9 @@ sub run {
         return $self->pack_flavor($options);
     }
 
-    local $ENV{MODULE_SETUP_DIR} = File::Temp->newdir if $options->{direct}; ## no critic
+
+    $self->{module_setup_dir} ||= $options->{module_setup_dir};
+    $self->{module_setup_dir}   = File::Temp->newdir if $options->{direct};
 
     unless ( -d $self->module_setup_dir('flavors') && -d $self->module_setup_dir('flavors', $options->{flavor}) ) {
         # setup the module-setup directory
@@ -105,6 +107,7 @@ sub setup_options {
         'flavor-class=s' => \($options->{flavor_class}),
         'plugin=s@'      => \($options->{plugins}),
         'target'         => \($options->{target}),
+        module_setup_dir => \($options->{module_setup_dir}),
         version          => sub {
             print "module-setup v$VERSION\n";
             exit 1;
@@ -180,7 +183,7 @@ sub load_plugins {
 
 sub module_setup_dir {
     my($self, @path) = @_;
-    my $base = $ENV{MODULE_SETUP_DIR} || do {
+    my $base = $self->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || do {
         eval { require File::HomeDir };
         my $home = $@ ? $ENV{HOME} : File::HomeDir->my_home;
         Path::Class::Dir->new( $home, '.module-setup' );
