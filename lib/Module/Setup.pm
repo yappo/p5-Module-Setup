@@ -30,9 +30,13 @@ sub log {
     print STDERR "$msg\n" if $HAS_TERM;
 }
 sub dialog {
-    my($self, $msg, $default) = @_;
+    my($self, $msg, $default, $validator_callback) = @_;
     return $default unless $HAS_TERM;
-    prompt($msg, $default);
+    while (1) {
+        my $ret = prompt($msg, $default);
+        return $ret unless $validator_callback && ref($validator_callback) eq 'CODE';
+        return $ret if $validator_callback->($self, $ret);
+    }
 }
 
 sub _clear_triggers {
@@ -206,7 +210,7 @@ sub _create_directory {
     my $dir = $opts{dir} || File::Basename::dirname($opts{file});
     unless (-e $dir) {
         $self->log("Creating directory $dir");
-        $dir = $dir->stringify if ref($dir) && $dir->can('stringify');
+        $dir = $dir->stringify if ref($dir) && $dir->can('stringify'); ## bad hack
         File::Path::mkpath($dir, 0, 0777); ## no critic
     }
 }
@@ -454,19 +458,28 @@ sub select_flavor {
     my $self = shift;
     return 'default' unless -d $self->module_setup_dir('flavors');
 
-    my $num = 1;
     my @flavors;
     for my $flavor ( $self->module_setup_dir('flavors')->children ) {
         next unless $flavor->is_dir;
-
         my $name = $flavor->dir_list(-1);
-        push @flavors, $name;
+        ($name eq 'default') ? unshift @flavors, $name :  push @flavors, $name;
+    }
+    return $flavors[0] if @flavors == 1;
 
-        $self->log( sprintf "[%d]: %s", $num++, $name );
+    my $num = 1;
+    my $message;
+    for my $flavor (@flavors) {
+        $message .= sprintf "[%d]: %s\n", $num++, $flavor;
     }
 
-    my $selected = $self->dialog( 'Select flavor:', 1 ) || 1;
-    $flavors[ $selected - 1 ] || 'default';
+    my $selected;
+    $self->dialog( "${message}Select flavor:", 1, sub {
+        my($self, $ret) = @_;
+        return unless $ret =~ /^[0-9]+$/;
+        $selected = $flavors[ $ret - 1 ];
+    } );
+    $self->log("You chose flavor: $selected");
+    return $selected;
 }
 
 1;
