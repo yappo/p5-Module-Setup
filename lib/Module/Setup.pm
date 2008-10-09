@@ -89,8 +89,8 @@ sub setup_base_dir {
     } else {
         $path = $self->options->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || File::HomeDir->my_home;
     }
-    $self->{base_dir} = Module::Setup::Path->new($path);
 
+    $self->{base_dir} = Module::Setup::Path->new($path);
     $self->base_dir->init_directories unless $self->base_dir->is_initialized;
 }
 
@@ -222,20 +222,24 @@ sub install_flavor {
     });
 }
 
+sub _load_flavor_class {
+    my($self, $class) = @_;
+    $class = "Module::Setup::Flavor::$class" unless $class =~ s/^\+//;
+    eval " require $class "; Carp::croak $@ if $@; ## no critic
+    $class;
+}
+
 sub create_flavor {
     my $self = shift;
 
     my $options = $self->options;
     my $name    = $options->{flavor};
-    my $class   = $options->{flavor_class};
-
-    $class = "Module::Setup::Flavor::$class" unless $class =~ s/^\+//;
-    eval " require $class "; Carp::croak $@ if $@; ## no critic
+    my $flavor_class = $self->_load_flavor_class($options->{flavor_class});
 
     $self->base_dir->set_flavor($name);
     Carp::croak "create flavor: $name exists " if $self->base_dir->flavor->is_exists;
 
-    my @template = $class->loader;
+    my @template = $flavor_class->loader;
     my $config = +{};
     for my $tmpl (@template) {
         if (exists $tmpl->{config} && ref($tmpl->{config}) eq 'HASH') {
@@ -369,6 +373,7 @@ END
 
 sub select_flavor {
     my $self = shift;
+    return 'default' if $self->options->{direct};
     return 'default' if $self->base_dir->flavors->path->children == 0;
 
     my @flavors;
