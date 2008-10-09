@@ -14,13 +14,13 @@ run {
 
     local $ENV{MODULE_SETUP_DIR} = File::Temp->newdir;
 
-    my $msetup = Module::Setup->new;
-
-    my $options = {
-        flavor_class => $block->flavor_class,
-        init         => 1,
-    };
-    $msetup->run($options, [ $block->flavor ]);
+    Module::Setup->new(
+        options => +{
+            flavor_class => $block->flavor_class,
+            init         => 1,
+        },
+        argv    => [ $block->flavor ],
+    )->run;
 
     ok -d Path::Class::Dir->new( $ENV{MODULE_SETUP_DIR}, 'flavors', $block->create_dir );
     ok -d Path::Class::Dir->new( $ENV{MODULE_SETUP_DIR}, 'flavors', $block->create_dir, 'plugins' );

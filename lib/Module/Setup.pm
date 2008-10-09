@@ -7,37 +7,61 @@ our $VERSION = '0.03';
 use Carp ();
 use Class::Trigger;
 use ExtUtils::MakeMaker qw(prompt);
-use Fcntl qw( :mode );
-use File::Basename;
-use File::Find::Rule;
+use File::HomeDir;
 use File::Path;
 use File::Temp;
 use Getopt::Long;
-use Module::Collect;
 use Path::Class;
 use Pod::Usage;
-use YAML ();
+
+use Module::Setup::Distribute;
+use Module::Setup::Path;
 
 our $HAS_TERM;
 
+sub argv       { shift->{argv} }
+sub config     { shift->{config} }
+sub options    { shift->{options} }
+sub base_dir   { shift->{base_dir} }
+sub distribute { shift->{distribute} }
+
 sub new {
-    my $class = shift;
-    bless {}, $class;
+    my($class, %args) = @_;
+
+    $args{options} ||= +{};
+    $args{argv}    ||= +[];
+
+    bless { %args }, $class;
 }
 
-sub log {
-    my($self, $msg) = @_;
-    print STDERR "$msg\n" if $HAS_TERM;
+sub setup_options {
+    my($self, %args) = @_;
+    $Module::Setup::HAS_TERM = 1;
+
+    pod2usage(2) unless @ARGV;
+
+    my $options = {};
+    GetOptions(
+        'init'             => \($options->{init}),
+        'pack'             => \($options->{pack}),
+        'direct'           => \($options->{direct}),
+        'flavor=s'         => \($options->{flavor}),
+        'flavor-class=s'   => \($options->{flavor_class}),
+        'plugin=s@'        => \($options->{plugins}),
+        'target'           => \($options->{target}),
+        'module-setup-dir' => \($options->{module_setup_dir}),
+        version            => sub {
+            print "module-setup v$VERSION\n";
+            exit 1;
+        },
+        help               => sub { pod2usage(1); },
+    ) or pod2usage(2);
+
+    $self->{options} = $options;
+    $self->{argv}    = \@ARGV;
+    $self;
 }
-sub dialog {
-    my($self, $msg, $default, $validator_callback) = @_;
-    return $default unless $HAS_TERM;
-    while (1) {
-        my $ret = prompt($msg, $default);
-        return $ret unless $validator_callback && ref($validator_callback) eq 'CODE';
-        return $ret if $validator_callback->($self, $ret);
-    }
-}
+
 
 sub _clear_triggers {
     my $self = shift;
@@ -46,108 +70,89 @@ sub _clear_triggers {
     delete $self->{_class_trigger_results};
 }
 
-sub run {
-    my($self, $options, $argv) = @_;
-    $self->_clear_triggers;
+sub _load_argv {
+    my($self, $name, $default) = @_;
 
-    $options ||= $self->setup_options;
-    my @argv = defined $argv && ref($argv) eq 'ARRAY' ? @{ $argv } : @ARGV;
-
-    $options->{flavor_class} ||= 'Default';
-
-    # create flavor
-    if ($options->{init}) {
-        $options->{flavor}   = shift @argv if @argv;
-        $options->{flavor} ||= 'default';
-        return $self->create_flavor($options);
+    $self->options->{$name} = @{ $self->argv } ? shift @{ $self->argv } : undef;
+    if (!$self->options->{$name} && defined $default) {
+        $self->options->{$name} = ref($default) eq 'CODE' ? $default->() : $default;
     }
-
-    # create module
-    $options->{module} = shift @argv;
-    $options->{flavor} = shift @argv if @argv;
-    $options->{flavor} ||= $self->select_flavor;
-
-    if ($options->{pack}) {
-        #pack flavor template
-        return $self->pack_flavor($options);
-    }
-
-
-    $self->{module_setup_dir} ||= $options->{module_setup_dir};
-    $self->{module_setup_dir}   = File::Temp->newdir if $options->{direct};
-
-    unless ( -d $self->flavors_dir && -d $self->flavors_dir($options->{flavor}) ) {
-        # setup the module-setup directory
-        $self->create_flavor($options);
-        $self->_create_directory( dir => $self->module_setup_dir('plugins') );
-    }
-
-    my $config = $self->load_config($options);
-    $self->load_plugins($config);
-
-    # create skeleton
-    my $attributes = $self->create_skeleton($config);
-    return unless $attributes;
-    $self->call_trigger( after_create_skeleton => $attributes );
-
-    # test
-    chdir Path::Class::Dir->new( @{ $attributes->{module_attribute}->{dist_path} } );
-    $self->call_trigger( check_skeleton_directory => $attributes );
-
-    $self->call_trigger( finalize_create_skeleton => $attributes );
+    $self->options->{$name};
 }
 
-sub setup_options {
+sub setup_base_dir {
     my $self = shift;
 
-    pod2usage(2) unless @ARGV;
+    my $path;
+    if ($self->options->{direct}) {
+        $path = File::Temp->newdir;
+    } else {
+        $path = $self->options->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || File::HomeDir->my_home;
+    }
+    $self->{base_dir} = Module::Setup::Path->new($path);
 
-    my $options = {};
-    GetOptions(
-        'init'           => \($options->{init}),
-        'pack'           => \($options->{pack}),
-        'direct'         => \($options->{direct}),
-        'flavor=s'       => \($options->{flavor}),
-        'flavor-class=s' => \($options->{flavor_class}),
-        'plugin=s@'      => \($options->{plugins}),
-        'target'         => \($options->{target}),
-        module_setup_dir => \($options->{module_setup_dir}),
-        version          => sub {
-            print "module-setup v$VERSION\n";
-            exit 1;
-        },
-        help             => sub { pod2usage(1); },
-    ) or pod2usage(2);
-
-    $options;
+    $self->base_dir->init_directories unless $self->base_dir->is_initialized;
 }
 
+sub run {
+    my $self    = shift;
+    my $options = $self->options;
+    $self->_clear_triggers;
+
+    $options->{flavor_class} ||= 'Default';
+    $self->setup_base_dir;
+
+    if ($options->{init}) {
+        $self->_load_argv( flavor => 'default' );
+        return $self->create_flavor;
+    }
+
+    $self->_load_argv( module => '' );
+    $self->_load_argv( flavor => sub { $self->select_flavor } );
+    $self->base_dir->set_flavor($options->{flavor});
+
+    Carp::croak "flavor name is required" unless $options->{flavor};
+    Carp::croak "module name is required" unless $options->{module};
+
+    return $self->pack_flavor if $options->{pack};
+
+    $self->create_flavor unless $self->base_dir->flavor->is_dir;
+
+    $self->load_config;
+    $self->load_plugins;
+
+    # create skeleton
+    return unless $self->create_skeleton;
+    $self->call_trigger( 'after_create_skeleton' );
+
+    # test
+    chdir $self->distribute->dist_path;
+    $self->call_trigger( 'check_skeleton_directory' );
+    $self->call_trigger( 'finalize_create_skeleton' );
+}
+
+
 sub load_config {
-    my($self, $options) = @_;
+    my $self = shift;
+    my $options = $self->options;
 
-    $options->{plugins} ||= [];
-    my @option_plugins = @{ delete $options->{plugins} };
-
-    my $config = YAML::LoadFile( $self->config_path($options->{flavor}) );
+    my $option_plugins = delete $options->{plugins} || [];
+    my $config = $self->base_dir->flavor->config->load;
     $config = +{
+        plugins => [],
         %{ $config },
         %{ $options },
     };
+    push @{ $config->{plugins} }, @{ $option_plugins };
 
-    $config->{plugins} ||= [];
-    push @{ $config->{plugins} }, @option_plugins;
-
-    $config;
+    $self->{config} = $config;
 }
 
 sub plugin_collect {
-    my($self, $config) = @_;
+    my $self = shift;
 
-    my @local_plugins;
-    push @local_plugins, @{ Module::Collect->new( path => $self->module_setup_dir('plugins') )->modules };
-    push @local_plugins, @{ Module::Collect->new( path => $self->plugins_dir($config->{flavor}) )->modules };
     my %loaded_local_plugin;
-    for my $local_plugin (@local_plugins) {
+    for my $local_plugin ( $self->base_dir->global_plugins->collect, $self->base_dir->flavor->plugins->collect ) {
         $local_plugin->require;
         if ($local_plugin->package->isa('Module::Setup::Plugin')) {
             $loaded_local_plugin{$local_plugin->package} = $local_plugin;
@@ -157,12 +162,12 @@ sub plugin_collect {
 }
 
 sub load_plugins {
-    my($self, $config) = @_;
+    my $self = shift;
 
-    my %loaded_local_plugin = $self->plugin_collect($config);
+    my %loaded_local_plugin = $self->plugin_collect;
 
-    my %loaded_plugin;
-    for my $plugin (@{ $config->{plugins} }) {
+    $self->{loaded_plugin} ||= +{};
+    for my $plugin (@{ $self->config->{plugins} }) {
         my $pkg;
         my $config = +{};
         if (ref($plugin)) {
@@ -181,51 +186,7 @@ sub load_plugins {
             eval "require $pkg"; ## no critic
             Carp::croak $@ if $@;
         }
-        $loaded_plugin{$pkg} = $pkg->new( context => $self, config => $config );
-    }
-}
-
-sub module_setup_dir {
-    my($self, @path) = @_;
-    my $base = $self->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || do {
-        eval { require File::HomeDir };
-        my $home = $@ ? $ENV{HOME} : File::HomeDir->my_home;
-        Path::Class::Dir->new( $home, '.module-setup' );
-    };
-
-    if (@path) {
-        my $new_base = Path::Class::Dir->new( $base, @path );
-        $new_base = Path::Class::File->new( $base, @path ) unless -d $base;
-        $base = $new_base;
-    }
-    $base;
-}
-sub flavors_dir { shift->module_setup_dir( 'flavors', @_ ); }
-sub plugins_dir {
-    my($self, $name, @path) = @_;
-    $self->module_setup_dir( 'flavors', $name, 'plugins', @path );
-}
-sub template_dir {
-    my($self, $name, @path) = @_;
-    $self->module_setup_dir( 'flavors', $name, 'template', @path );
-}
-sub config_path {
-    my($self, $name) = @_;
-    $self->module_setup_dir( 'flavors', $name, 'config.yaml' );
-}
-
-
-sub create_directory {
-    my $self = shift;
-    $self->_create_directory(@_);
-}
-sub _create_directory {
-    my($self, %opts) = @_;
-    my $dir = $opts{dir} || File::Basename::dirname($opts{file});
-    unless (-e $dir) {
-        $self->log("Creating directory $dir");
-        $dir = $dir->stringify if ref($dir) && $dir->can('stringify'); ## bad hack
-        File::Path::mkpath($dir, 0, 0777); ## no critic
+        $self->{loaded_plugin}->{$pkg} = $pkg->new( context => $self, config => $self->config );
     }
 }
 
@@ -236,14 +197,14 @@ sub write_file {
     if (-e $path) {
         my $ans = $self->dialog("$path exists. Override? [yN] ", 'n');
         return if $ans !~ /[Yy]/;
+    } else {
+        $path->dir->mkpath;
     }
 
-    $self->_create_directory( file => $path );
-
     $self->log("Creating $path");
-    open my $out, ">", $path or die "$path: $!";
-    print $out $opts->{template};
-    close $out;
+    my $out = $path->openw;
+    $out->print($opts->{template});
+    $out->close;
 
     chmod oct($opts->{chmod}), $path if $opts->{chmod};
 }
@@ -251,59 +212,28 @@ sub write_file {
 sub install_flavor {
     my($self, $name, $tmpl) = @_;
 
+    my $flavor = $self->base_dir->flavor;
     my $path = (exists $tmpl->{plugin} && $tmpl->{plugin}) ?
-        $self->plugins_dir( $name => $tmpl->{plugin} ) :
-            $self->template_dir( $name => $tmpl->{file} );
+        $flavor->plugins->path_to($tmpl->{plugin}) : $flavor->template->path_to($tmpl->{file});
+
     $self->write_file(+{
         dist_path => $path,
         %{ $tmpl },
     });
 }
 
-sub write_template {
-    my($self, $options) = @_;
-
-    $self->call_trigger( template_process => $options );
-    $options->{template} = delete $options->{content} unless $options->{template};
-    $options->{dist_path} =~ s/____var-(.+)-var____/$options->{vars}->{$1} || $options->{vars}->{config}->{$1}/eg;
-
-    push @{ $self->{install_files} }, $options->{dist_path};
-    $self->write_file($options);
-}
-
-sub install_template {
-    my($self, $base, $path, $vars, $module_attribute) = @_;
-
-    my $src  = Path::Class::File->new($base, $path);
-    my $dist = Path::Class::File->new(@{ $module_attribute->{dist_path} }, $path);
-
-    my $mode = ( stat $src )[2];
-    $mode = sprintf "%03o", S_IMODE($mode);
-
-    open my $fh, '<', $src or die "$src: $!";
-    my $template = do { local $/; <$fh> };
-    close $fh;
-
-    my $options = {
-        dist_path => $dist,
-        template  => $template,
-        chmod     => $mode,
-        vars      => $vars,
-        content   => undef,
-    };
-    $self->write_template($options);
-}
-
 sub create_flavor {
-    my($self, $options) = @_;
-    $options ||= +{};
-    my $name  = $options->{flavor};
-    my $class = $options->{flavor_class};
+    my $self = shift;
+
+    my $options = $self->options;
+    my $name    = $options->{flavor};
+    my $class   = $options->{flavor_class};
 
     $class = "Module::Setup::Flavor::$class" unless $class =~ s/^\+//;
-
-    Carp::croak "create flavor: $name exists " if -d $self->flavors_dir($name);
     eval " require $class "; Carp::croak $@ if $@; ## no critic
+
+    $self->base_dir->set_flavor($name);
+    Carp::croak "create flavor: $name exists " if $self->base_dir->flavor->is_exists;
 
     my @template = $class->loader;
     my $config = +{};
@@ -316,98 +246,68 @@ sub create_flavor {
     }
 
     # plugins
-    $self->_create_directory( dir => $self->plugins_dir($name) );
+    $self->base_dir->flavor->plugins->path->mkpath;
 
     if (exists $options->{plugins} && $options->{plugins} && @{ $options->{plugins} }) {
         $config->{plugins} ||= [];
-        push @{ $config->{plugins} }, @{ $options->{plugins} };
+        push @{ $config->{plugins} }, @{ delete $options->{plugins} };
     }
     $config->{plugins} ||= [];
 
     # load plugins
-    $self->load_plugins(+{
+    local $self->{config} = +{
         %{ $config },
         %{ $options },
         plugins => $config->{plugins},
-    });
+    };
+    $self->load_plugins;
 
     $self->call_trigger( befor_dump_config => $config );
 
     $self->_clear_triggers;
 
-    # save config
-    YAML::DumpFile($self->config_path($name), $config);
-}
-
-sub _find_flavor_template {
-    my($self, $config) = @_;
-    my $module = $config->{module};
-    my $flavor = $config->{flavor};
-
-    Carp::croak "module name is required" unless $module;
-
-    my $flavor_path = $self->flavors_dir($flavor);
-    Carp::croak "No such flavor: $flavor" unless -d $flavor_path;
-
-    my @files = File::Find::Rule->new->file->relative->in( $self->template_dir($flavor) );
-    Carp::croak "No such flavor template files: $flavor" unless @files;
-    @files;
+    $self->base_dir->flavor->config->dump($config);
 }
 
 sub create_skeleton {
-    my($self, $config) = @_;
-    $config ||= +{};
-    $self->{install_files} = [];
+    my $self   = shift;
+    my $config = $self->config;
 
-    my @files = $self->_find_flavor_template($config);
-
-    my $module = $config->{module};
     my $flavor = $config->{flavor};
 
-    my @pkg  = split /::/, $module;
-    my $module_attribute = +{
-        module    => $module,
-        package   => \@pkg,
-        dist_name => join('-', @pkg),
-        dist_path => [ join('-', @pkg) ],
-    };
-    if (exists $config->{target} && $config->{target}) {
-        unshift @{ $module_attribute->{dist_path} }, $config->{target};
-    }
-    $self->call_trigger( after_setup_module_attribute => $module_attribute);
-
-    $self->create_directory( dir => Path::Class::Dir->new(@{ $module_attribute->{dist_path} }) );
+    $self->{distribute} = Module::Setup::Distribute->new(
+        $config->{module},
+        target => $config->{target},
+    );
+    $self->call_trigger( 'after_setup_module_attribute' );
+    $self->distribute->dist_path->mkpath;
 
     my $template_vars = {
-        module      => $module_attribute->{module},
-        dist        => $module_attribute->{dist_name},
-        module_path => join('/', @{ $module_attribute->{package} }),
+        module      => $self->distribute->module,
+        dist        => $self->distribute->dist_name,
+        module_path => $self->distribute->module_path,
         config      => $config,
         localtime   => scalar localtime,
     };
     $self->call_trigger( after_setup_template_vars => $template_vars);
+    $self->{distribute}->set_template_vars($template_vars);
 
-    my $base = $self->template_dir($flavor);
-    for my $path (@files) {
-        $self->install_template($base, $path, $template_vars, $module_attribute);
+    for my $path ($self->base_dir->flavor->template->find_files) {
+        $self->{distribute}->install_template($self, $path);
     }
-    $self->call_trigger( append_template_file => $template_vars, $module_attribute);
+    $self->call_trigger( 'append_template_file' );
 
-    return +{
-        module_attribute => $module_attribute,
-        template_vars    => $template_vars,
-        install_files    => $self->{install_files},
-    };
+    return $template_vars;
 }
 
 sub pack_flavor {
-    my($self, $config) = @_;
+    my $self = shift;
+    my $config = $self->options;
     my $module = $config->{module};
     my $flavor = $config->{flavor};
 
-    my @template_files = $self->_find_flavor_template($config);
-
-    my @plugin_files = File::Find::Rule->new->file->relative->in( $self->plugins_dir($flavor) );
+    my @template_files = $self->base_dir->flavor->template->find_files;
+    my @plugin_files = $self->base_dir->flavor->plugins->find_files;
 
     my @template;
     for my $conf (
@@ -417,9 +317,10 @@ sub pack_flavor {
     ) {
         my $base_path;
         if ($conf->{type} eq 'config') {
-            $base_path = $self->module_setup_dir('flavors', $flavor);
+            $base_path = $self->base_dir->flavor->path;
         } else {
-            $base_path = $self->module_setup_dir('flavors', $flavor, $conf->{type});
+            my $type   = $conf->{type};
+            $base_path = $self->base_dir->flavor->$type->path;
         }
 
         for my $file (@{ $conf->{files} }) {
@@ -436,7 +337,7 @@ sub pack_flavor {
                 close $fh;
                 my $path_name = $conf->{type} eq 'template' ? 'file' : 'plugin';
                 push @template, +{
-                    $path_name => $file,
+                    $path_name => "$file",
                     template   => $data,
                 };
             }
@@ -470,10 +371,10 @@ END
 
 sub select_flavor {
     my $self = shift;
-    return 'default' unless -d $self->module_setup_dir('flavors');
+    return 'default' if $self->base_dir->flavors->path->children == 0;
 
     my @flavors;
-    for my $flavor ( $self->flavors_dir->children ) {
+    for my $flavor ( $self->base_dir->flavors->path->children ) {
         next unless $flavor->is_dir;
         my $name = $flavor->dir_list(-1);
         ($name eq 'default') ? unshift @flavors, $name :  push @flavors, $name;
@@ -494,6 +395,20 @@ sub select_flavor {
     } );
     $self->log("You chose flavor: $selected");
     return $selected;
+}
+
+sub log {
+    my($self, $msg) = @_;
+    print STDERR "$msg\n" if $HAS_TERM;
+}
+sub dialog {
+    my($self, $msg, $default, $validator_callback) = @_;
+    return $default unless $HAS_TERM;
+    while (1) {
+        my $ret = prompt($msg, $default);
+        return $ret unless $validator_callback && ref($validator_callback) eq 'CODE';
+        return $ret if $validator_callback->($self, $ret);
+    }
 }
 
 1;

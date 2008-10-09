@@ -23,23 +23,20 @@ sub add_trigger {
 }
 
 sub append_template_file {
-    my($self, $context, $template_vars, $module_attribute) = @_;
+    my($self, $context) = @_;
     my $caller = caller;
-
     my @template = Module::Setup::Flavor::loader($caller);
 
     for my $tmpl (@template) {
         next unless exists $tmpl->{file};
-        my $dist_path = Path::Class::File->new(@{ $module_attribute->{dist_path} }, $tmpl->{file});
-
         my $options = {
-            dist_path => $dist_path,
+            dist_path => $context->distribute->dist_path->file($tmpl->{file}),
             template  => $tmpl->{template},
-            vars      => $template_vars,
+            vars      => $context->distribute->template_vars,
             content   => undef,
         };
         $options->{chmod} = $tmpl->{chmod} if $tmpl->{chmod};
-        $context->write_template($options);
+        $context->distribute->write_template($context, $options);
     }
 }
 

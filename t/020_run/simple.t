@@ -16,23 +16,15 @@ run {
 
     local $ENV{MODULE_SETUP_DIR} = $dir_cache{$dir_count++} = File::Temp->newdir;
 
-    my $msetup = Module::Setup->new;
-
     my $target = $dir_cache{$dir_count++} = File::Temp->newdir;
-    my $options = {
-        target => $target,
-    };
 
-    no warnings 'redefine';
-    *Module::Setup::dialog = sub {
-        my($self, $msg, $default) = @_;
-        return 'n' if $msg =~ /Check Makefile.PL\?/i;
-        return 'n' if $msg =~ /Subversion friendly\?/i;
-        return $default;
-    };
-    my $args = [ $block->module ];
-    push @{ $args }, $block->flavor if $block->flavor;
-    $msetup->run($options, $args);
+    my $argv = [ $block->module ];
+    push @{ $argv }, $block->flavor if $block->flavor;
+
+    Module::Setup->new(
+        options => { target => $target },
+        argv    => $argv,
+    )->run;
 
     ok -d Path::Class::Dir->new( $target, $block->create_dir );
     ok -d Path::Class::Dir->new( $target, $block->create_dir, 't' );
@@ -41,8 +33,17 @@ run {
 
     ok -f Path::Class::File->new( $target, $block->create_dir, 'lib', join('/',  @{ $block->libs }) );
     ok -f Path::Class::File->new( $target, $block->create_dir, 'Makefile.PL' );
-}
+};
 
+BEGIN {
+    no warnings 'redefine';
+    *Module::Setup::dialog = sub {
+        my($self, $msg, $default) = @_;
+        return 'n' if $msg =~ /Check Makefile.PL\?/i;
+        return 'n' if $msg =~ /Subversion friendly\?/i;
+        return $default;
+    };
+}
 
 __END__
 

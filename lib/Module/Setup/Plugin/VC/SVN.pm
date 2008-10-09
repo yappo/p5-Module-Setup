@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base 'Module::Setup::Plugin';
 
-use Path::Class;
+use Module::Setup::Path::Dir;
 
 sub register {
     my($self, ) = @_;
@@ -11,10 +11,10 @@ sub register {
 }
 
 sub after_setup_module_attribute {
-    my($self, $module_attribute) = @_;
+    my $self = shift;
     if ($self->dialog("Subversion friendly? [Yn] ", 'y') =~ /[Yy]/) {
-        $self->create_directory( dir => Path::Class::Dir->new( $module_attribute->{dist_name}, $_) ) for (qw/ trunk tags branches /);
-        push @{ $module_attribute->{dist_path} }, 'trunk';
+        $self->distribute->dist_path->subdir($_)->mkpath for (qw/ trunk tags branches /);
+        $self->distribute->{dist_path} = Module::Setup::Path::Dir->new($self->distribute->dist_path, 'trunk');
     }
 }
 
