@@ -62,7 +62,7 @@ module attribute setup L<Module::Setup::Plugin::VC::SVN>
 
 template parameters setup
 
-=head2 append_template_file $template_vars, $module_attribute
+=head2 append_template_file
 
 add module template file for new module L<Module::Setup::Plugin::VC::Git>
 
@@ -70,21 +70,15 @@ add module template file for new module L<Module::Setup::Plugin::VC::Git>
 
 for template process L<Module::Setup::Plugin::Template>
 
-=head2 check_skeleton_directory $attributes
+=head2 check_skeleton_directory
 
   for test L<Module::Setup::Plugin::Test::Makefile>
 
-  $attributes = +{
-      module_attribute => +{ module_attribute },
-      template_vars    => +{ template_vars },
-      instal_files     => +[ install_files ],
-  };
-
-=head2 after_create_skeleton $attributes
+=head2 after_create_skeleton
 
 after create_skeleton
 
-=head2 finalize_create_skeleton $attributes
+=head2 finalize_create_skeleton
 
 last trigger of run method
 
