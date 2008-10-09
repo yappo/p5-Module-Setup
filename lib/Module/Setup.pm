@@ -302,52 +302,34 @@ sub create_skeleton {
     return $template_vars;
 }
 
+sub _collect_flavor_files {
+    my($self, $template, $path_name, $type) = @_;
+
+    my $base_path = $type->path;
+    for my $file ($type->find_files) {
+        my $data = $type->path_to($file)->slurp;
+        push @{ $template }, +{
+            $path_name => "$file",
+            template   => $data,
+        };
+    }
+}
+
 sub pack_flavor {
     my $self = shift;
     my $config = $self->options;
     my $module = $config->{module};
     my $flavor = $config->{flavor};
 
-    my @template_files = $self->base_dir->flavor->template->find_files;
-    my @plugin_files = $self->base_dir->flavor->plugins->find_files;
-
-    my @template;
-    for my $conf (
-        { type => 'template', files => \@template_files },
-        { type => 'plugins' , files => \@plugin_files },
-        { type => 'config'  , files =>['config.yaml'] },
-    ) {
-        my $base_path;
-        if ($conf->{type} eq 'config') {
-            $base_path = $self->base_dir->flavor->path;
-        } else {
-            my $type   = $conf->{type};
-            $base_path = $self->base_dir->flavor->$type->path;
-        }
-
-        for my $file (@{ $conf->{files} }) {
-            my $path = Path::Class::File->new($base_path, $file);
-
-            if ($conf->{type} eq 'config') {
-                my $data = YAML::LoadFile($path);
-                push @template, +{
-                    config => $data
-                };
-            } else {
-                open my $fh, '<', $path or die "$path: $!";
-                my $data = do { local $/; <$fh> };
-                close $fh;
-                my $path_name = $conf->{type} eq 'template' ? 'file' : 'plugin';
-                push @template, +{
-                    $path_name => "$file",
-                    template   => $data,
-                };
-            }
-        }
-    }
+    my $template = [];
+    $self->_collect_flavor_files($template, file   => $self->base_dir->flavor->template);
+    $self->_collect_flavor_files($template, plugin => $self->base_dir->flavor->plugins);
+    push @{ $template }, +{
+        config => YAML::LoadFile($self->base_dir->flavor->config->path),
+    };
 
     my $eq = '=';
-    my $yaml = YAML::Dump(@template);
+    my $yaml = YAML::Dump(@{ $template });
     print <<END;
 package $module;
 use strict;
