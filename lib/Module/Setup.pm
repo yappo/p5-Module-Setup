@@ -273,8 +273,6 @@ sub create_skeleton {
     my $self   = shift;
     my $config = $self->config;
 
-    my $flavor = $config->{flavor};
-
     $self->{distribute} = Module::Setup::Distribute->new(
         $config->{module},
         target => $config->{target},

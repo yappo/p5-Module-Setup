@@ -41,18 +41,12 @@ sub set_template_vars {
 sub install_template {
     my($self, $context, $path) = @_;
 
-    my $src  = $context->base_dir->flavor->template->path_to($path);
-    my $dist = $self->dist_path->file($path);
-
-    my $mode = ( stat $src )[2];
-    $mode = sprintf "%03o", S_IMODE($mode);
-
+    my $src      = $context->base_dir->flavor->template->path_to($path);
     my $template = $src->slurp;
-
-    my $options = {
-        dist_path => $dist,
+    my $options = +{
+        dist_path => $self->dist_path->file($path),
         template  => $template,
-        chmod     => $mode,
+        chmod     => sprintf('%03o', S_IMODE(( stat $src )[2])),
         vars      => $self->template_vars,
         content   => undef,
     };

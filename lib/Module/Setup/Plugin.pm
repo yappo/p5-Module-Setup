@@ -23,8 +23,8 @@ sub add_trigger {
 }
 
 sub append_template_file {
-    my($self, $context) = @_;
-    my $caller = caller;
+    my($self, $context, $caller) = @_;
+    $caller ||= caller;
     my @template = Module::Setup::Flavor::loader($caller);
 
     for my $tmpl (@template) {
