@@ -1,5 +1,11 @@
 Revision history for Perl extension Module::Setup
 
+0.03_01 2008-10-10T20:29:36+09:00
+	- add module_setup_dir option
+        - add t/020_run/direct.t and t/020_run/pack.t
+        - Change to built-in api
+        - too many refactoring
+
 0.03    2008-10-07T20:01:05+09:00
         - add flavor select option (core)
         - add dependence to Module::Install::AuthorTests for Flavor::Default franck++
