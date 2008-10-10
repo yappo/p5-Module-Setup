@@ -7,7 +7,7 @@ requires 'ExtUtils::MakeMaker';
 requires 'File::Basename';
 requires 'File::Find::Rule';
 requires 'File::Path';
-requires 'File::Temp';
+requires 'File::Temp' => 0.20;
 requires 'Getopt::Long';
 requires 'Module::Collect' => 0.04;
 requires 'Path::Class';
