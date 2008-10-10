@@ -1,5 +1,6 @@
 bin/module-setup
 Changes
+inc/IO/Scalar.pm
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -17,9 +18,19 @@ inc/Test/Builder.pm
 inc/Test/Builder/Module.pm
 inc/Test/More.pm
 lib/Module/Setup.pm
+lib/Module/Setup/Distribute.pm
 lib/Module/Setup/Flavor.pm
 lib/Module/Setup/Flavor/CodeRepos.pm
 lib/Module/Setup/Flavor/Default.pm
+lib/Module/Setup/Path.pm
+lib/Module/Setup/Path/Base.pm
+lib/Module/Setup/Path/Config.pm
+lib/Module/Setup/Path/Dir.pm
+lib/Module/Setup/Path/File.pm
+lib/Module/Setup/Path/Flavor.pm
+lib/Module/Setup/Path/Flavors.pm
+lib/Module/Setup/Path/Plugins.pm
+lib/Module/Setup/Path/Template.pm
 lib/Module/Setup/Plugin.pm
 lib/Module/Setup/Plugin/Config/Basic.pm
 lib/Module/Setup/Plugin/Template.pm
@@ -31,5 +42,8 @@ MANIFEST			This list of files
 META.yml
 README
 t/00_compile.t
+t/020_run/direct.t
 t/020_run/init.t
+t/020_run/pack.t
 t/020_run/simple.t
+t/Flavor/Direct.pm
