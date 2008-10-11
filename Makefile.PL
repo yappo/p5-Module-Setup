@@ -6,6 +6,7 @@ requires 'Class::Trigger';
 requires 'ExtUtils::MakeMaker';
 requires 'File::Basename';
 requires 'File::Find::Rule';
+requires 'File::HomeDir';
 requires 'File::Path';
 requires 'File::Temp'      => 0.20;
 requires 'Getopt::Long';
