@@ -448,7 +448,7 @@ When the module-setup command is executed first, a necessary template for ~/.mod
 
 L<Module::Starter> is very useful module. However customize of module template is complex.
 
-If L<Module::Sterter::PBP> is used, do you solve it?
+If L<Module::Starter::PBP> is used, do you solve it?
 
 Yes, but switch of two or more templates is complex.
 
