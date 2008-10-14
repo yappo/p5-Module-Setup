@@ -1,5 +1,8 @@
 Revision history for Perl extension Module::Setup
 
+0.03_02 2008-10-14T12:29:43+09:00
+        - add dependence File::HomeDir
+
 0.03_01 2008-10-10T20:29:36+09:00
 	- add module_setup_dir option
         - add t/020_run/direct.t and t/020_run/pack.t
