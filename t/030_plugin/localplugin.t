@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use File::Temp;
 use Path::Class;
 
@@ -17,13 +17,12 @@ Module::Setup->new(
     argv => [ 'LocalPlugin' ],
 )->run;
 
-ok -f Path::Class::Dir->new( $module_setup_dir, 'flavors', 'default', 'plugins', 'localplugin.pm' );
+ok -f Path::Class::File->new( $module_setup_dir, 'flavors', 'default', 'plugins', 'localplugin.pm' );
 
-ok -f Path::Class::Dir->new( $module_setup_dir, 'flavors', 'default', 'template', 'text.txt' );
-ok -f Path::Class::Dir->new( $module_setup_dir, 'flavors', 'default', 'template', 'append.txt' );
+ok -f Path::Class::File->new( $module_setup_dir, 'flavors', 'default', 'template', 'test.txt' );
 
-ok -f Path::Class::Dir->new( $target, 'LocalPlugin', 'test.txt' );
-ok -f Path::Class::Dir->new( $target, 'LocalPlugin', 'append.txt' );
+ok -f Path::Class::File->new( $target, 'LocalPlugin', 'test.txt' );
+ok -f Path::Class::File->new( $target, 'LocalPlugin', 'append.txt' );
 
 no warnings 'redefine';
 my $flavor;
