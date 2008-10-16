@@ -214,8 +214,14 @@ sub install_flavor {
     my($self, $name, $tmpl) = @_;
 
     my $flavor = $self->base_dir->flavor;
-    my $path = (exists $tmpl->{plugin} && $tmpl->{plugin}) ?
-        $flavor->plugins->path_to($tmpl->{plugin}) : $flavor->template->path_to($tmpl->{file});
+    my $path;
+    if (exists $tmpl->{file} && $tmpl->{file}) {
+        $path = $flavor->template->path_to(split '/', $tmpl->{file});
+    } elsif (exists $tmpl->{dir} && $tmpl->{dir}) {
+        $path = $flavor->template->path_to(split '/', $tmpl->{dir});
+    } elsif (exists $tmpl->{plugin} && $tmpl->{plugin}) {
+        $path = $flavor->plugins->path_to(split '/', $tmpl->{plugin});
+    }
 
     $self->write_file(+{
         dist_path => $path,
