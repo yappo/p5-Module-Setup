@@ -314,15 +314,17 @@ sub _collect_flavor_files {
 
     my $base_path = $type->path;
     for my $file ($type->find_files) {
+        my @path = $file->is_dir ? $file->dir_list : ($file->dir->dir_list, $file->basename);
+        while ($path[0] eq '.') { shift @path };
+
         if ($file->is_dir) {
             push @{ $template }, +{
-                dir => join('/', $file->dir_list),
+                dir => join('/', @path),
             };
         } else {
-            my $data = $type->path_to($file)->slurp;
             push @{ $template }, +{
-                $path_name => join('/', $file->dir->dir_list, $file->basename),
-                template   => $data,
+                $path_name => join('/', @path),
+                template   => $type->path_to($file)->slurp || '',
             };
         }
     }
