@@ -473,6 +473,8 @@ if incorporating Module::Setup in your application, you can make Helper which is
 
 Kazuhiro Osawa E<lt>ko@yappo.ne.jpE<gt>
 
+walf443
+
 =head1 SEE ALSO
 
 L<Module::Setup::Plugin>, L<module-setup>
