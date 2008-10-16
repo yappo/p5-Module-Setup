@@ -1,5 +1,10 @@
 Revision history for Perl extension Module::Setup
 
+0.03_03 2008-10-16T22:06:19+09:00
+        - add empty directory support on flavor
+	- portably perform operations on flavor
+        - pod fix
+
 0.03_02 2008-10-14T12:29:43+09:00
         - add dependence File::HomeDir
 
