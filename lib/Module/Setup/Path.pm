@@ -36,7 +36,7 @@ sub global_plugins { shift->{global_plugins} }
 
 sub is_initialized {
     my $self = shift;
-    $self->is_dir &&$self->global_plugins->is_dir;
+    $self->is_dir && $self->global_plugins->is_dir;
 }
 
 sub init_directories {
