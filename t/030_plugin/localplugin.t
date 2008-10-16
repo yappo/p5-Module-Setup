@@ -17,7 +17,7 @@ Module::Setup->new(
     argv => [ 'LocalPlugin' ],
 )->run;
 
-ok -f Path::Class::Dir->new( $module_setup_dir, 'flavors', 'default', 'plugins', 'localplugin.pl' );
+ok -f Path::Class::Dir->new( $module_setup_dir, 'flavors', 'default', 'plugins', 'localplugin.pm' );
 
 ok -f Path::Class::Dir->new( $module_setup_dir, 'flavors', 'default', 'template', 'text.txt' );
 ok -f Path::Class::Dir->new( $module_setup_dir, 'flavors', 'default', 'template', 'append.txt' );
@@ -37,5 +37,5 @@ Module::Setup->new(
 )->run;
 
 like $flavor, qr/package LocalPlugin;/;
-like $flavor, qr!plugin: localplugin.pl!;
+like $flavor, qr!plugin: localplugin.pm!;
 

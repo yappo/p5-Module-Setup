@@ -15,7 +15,7 @@ file: test.txt
 template: |
   test text
 ---
-plugin: localplugin.pl
+plugin: localplugin.pm
 template: |
   package LocalPlugin;
   use strict;
