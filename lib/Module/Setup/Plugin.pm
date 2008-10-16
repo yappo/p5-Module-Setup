@@ -88,7 +88,7 @@ last trigger of run method
 
 =head1 Plugin Example
 
-~/.module-setup/flavor/myflavor/plugins/plugin.pl
+~/.module-setup/flavor/myflavor/plugins/plugin.pm
   package MyFlavor::Plugin;
   use strict;
   use warnings;
