@@ -1,4 +1,5 @@
 use inc::Module::Install;
+use 5.008001;
 name 'Module-Setup';
 all_from 'lib/Module/Setup.pm';
 
