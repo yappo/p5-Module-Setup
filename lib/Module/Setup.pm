@@ -316,12 +316,12 @@ sub _collect_flavor_files {
     for my $file ($type->find_files) {
         if ($file->is_dir) {
             push @{ $template }, +{
-                dir => "$file",
+                dir => join('/', $file->dir_list),
             };
         } else {
             my $data = $type->path_to($file)->slurp;
             push @{ $template }, +{
-                $path_name => "$file",
+                $path_name => join('/', $file->dir->dir_list, $file->basename),
                 template   => $data,
             };
         }

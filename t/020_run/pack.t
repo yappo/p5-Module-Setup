@@ -52,7 +52,7 @@ __END__
 - Foo::Bar::Flavor
 --- regexp_1: package Foo::Bar::Flavor;
 --- regexp_2: Makefile.PL
---- regexp_3: lib
+--- regexp_3: lib/____var-module_path-var____.pm
 
 ===
 --- argv yaml
