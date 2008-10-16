@@ -88,7 +88,7 @@ sub setup_base_dir {
     if ($self->options->{direct}) {
         $path = File::Temp->newdir;
     } else {
-        $path = $self->options->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || File::HomeDir->my_home;
+        $path = $self->options->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || Path::Class::Dir->new(File::HomeDir->my_home, '.module-setup');
     }
 
     $self->{base_dir} = Module::Setup::Path->new($path);
