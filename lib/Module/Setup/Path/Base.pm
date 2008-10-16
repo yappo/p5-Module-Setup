@@ -33,8 +33,22 @@ sub path_to {
 sub find_files {
     my $self = shift;
     map {
-        -d $_ ? Module::Setup::Path::Dir->new($_) : Module::Setup::Path::File->new($_)
-    } File::Find::Rule->new->file->relative->in( $self->path );
+        my $path = Path::Class::Dir->new($self->path, $_);
+        my $ret;
+        if (-d $path) {
+            $ret = Module::Setup::Path::Dir->new($_) unless $path->children;
+        } else {
+            $ret = Module::Setup::Path::File->new($_);
+        }
+        $ret ? $ret : ();
+    } File::Find::Rule->new->relative->in( $self->path );
 }
+
+#sub find_directories {
+#    my $self = shift;
+#    map {
+#        -d $_ ? Module::Setup::Path::Dir->new($_) : Module::Setup::Path::File->new($_)
+#    } File::Find::Rule->new->dir->relative->in( $self->path );
+#}
 
 1;

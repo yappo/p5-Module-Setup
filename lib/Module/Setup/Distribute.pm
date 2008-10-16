@@ -42,10 +42,9 @@ sub install_template {
     my($self, $context, $path) = @_;
 
     my $src      = $context->base_dir->flavor->template->path_to($path);
-    my $template = $src->slurp;
     my $options = +{
-        dist_path => $self->dist_path->file($path),
-        template  => $template,
+        dist_path => ($src->is_dir ? $self->dist_path->subdir($path) : $self->dist_path->file($path)),
+        template  => ($src->is_dir ? undef : $src->slurp || undef),
         chmod     => sprintf('%03o', S_IMODE(( stat $src )[2])),
         vars      => $self->template_vars,
         content   => undef,
@@ -57,9 +56,12 @@ sub write_template {
     my($self, $context, $options) = @_;
     my $is_dir = $options->{dist_path}->is_dir;
 
-    $context->call_trigger( template_process => $options );
-    $options->{template} = delete $options->{content} unless $options->{template};
+    unless ($is_dir) {
+        $context->call_trigger( template_process => $options );
+        $options->{template} = delete $options->{content} unless $options->{template};
+    }
     $options->{dist_path} =~ s/____var-(.+)-var____/$options->{vars}->{$1} || $options->{vars}->{config}->{$1}/eg;
+    $context->call_trigger( replace_distribute_path => $options );
 
     if ($is_dir) {
         $options->{dist_path} = Module::Setup::Path::Dir->new($options->{dist_path});
@@ -68,7 +70,8 @@ sub write_template {
     }
 
     push @{ $self->{install_files} }, $options->{dist_path};
-    $context->write_file($options);
+
+    $is_dir ? $options->{dist_path}->mkpath : $context->write_file($options);
 }
 
 1;
