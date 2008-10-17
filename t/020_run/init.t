@@ -1,35 +1,23 @@
-use strict;
-use warnings;
+use t::Utils;
 use Test::Base;
-use File::Temp;
-use Path::Class;
 use YAML ();
-
-use Module::Setup;
 
 plan tests => 5 * blocks;
 
 run {
     my $block = shift;
 
-    local $ENV{MODULE_SETUP_DIR} = File::Temp->newdir;
+    module_setup { flavor_class => $block->flavor_class, init => 1 }, $block->flavor;
 
-    Module::Setup->new(
-        options => +{
-            flavor_class => $block->flavor_class,
-            init         => 1,
-        },
-        argv    => [ $block->flavor ],
-    )->run;
+    ok -d flavors_dir  $block->create_dir;
+    ok -d plugins_dir  $block->create_dir;
+    ok -d template_dir $block->create_dir;
+    ok -f config_file  $block->create_dir;
 
-    ok -d Path::Class::Dir->new( $ENV{MODULE_SETUP_DIR}, 'flavors', $block->create_dir );
-    ok -d Path::Class::Dir->new( $ENV{MODULE_SETUP_DIR}, 'flavors', $block->create_dir, 'plugins' );
-    ok -d Path::Class::Dir->new( $ENV{MODULE_SETUP_DIR}, 'flavors', $block->create_dir, 'template' );
-    my $config = Path::Class::File->new( $ENV{MODULE_SETUP_DIR}, 'flavors', $block->create_dir, 'config.yaml' );
-    ok -f $config;
-
-    my $yaml = YAML::LoadFile($config);
+    my $yaml = YAML::LoadFile(config_file  $block->create_dir);
     is ref($yaml), 'HASH';
+
+    clear_tempdir;
 }
 
 

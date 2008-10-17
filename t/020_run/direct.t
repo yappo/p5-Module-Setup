@@ -1,25 +1,10 @@
-use strict;
-use warnings;
+use t::Utils;
 use Test::More tests => 3;
-use File::Temp;
-use Path::Class;
 
-use Module::Setup;
+module_setup { flavor_class => '+t::Flavor::Direct', direct => 1, target => 1 }, 'FromDirect';
 
-my $module_setup_dir = File::Temp->newdir;
-my $target           = File::Temp->newdir;
-Module::Setup->new(
-    options => {
-        direct           => 1,
-        flavor_class     => '+t::Flavor::Direct',
-        module_setup_dir => $module_setup_dir,
-        target           => $target,
-    },
-    argv => [ 'FromDirect' ],
-)->run;
+ok -d target_dir('FromDirect');
+ok -f target_dir('FromDirect')->file('DirectFile.txt');
 
-ok -d Path::Class::Dir->new( $target, 'FromDirect' );
-ok -f Path::Class::File->new( $target, 'FromDirect', 'DirectFile.txt' );
-
-my $file = Path::Class::File->new( $target, 'FromDirect', 'DirectFile.txt' )->slurp;
+my $file = target_dir('FromDirect')->file('DirectFile.txt')->slurp;
 like $file, qr/Direct Content/;

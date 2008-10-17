@@ -1,41 +1,23 @@
-use strict;
-use warnings;
+use t::Utils;
 use Test::Base;
-use File::Temp;
-use Path::Class;
 use YAML ();
-
-use Module::Setup;
 
 plan tests => 3 * blocks;
 
-my %dir_cache;
-my $dir_count = 0;
-
-my $flavor;
-no warnings 'redefine';
-*Module::Setup::stdout = sub { $flavor = $_[1] };
-
 run {
     my $block = shift;
-    local $ENV{MODULE_SETUP_DIR} = $dir_cache{$dir_count++} = File::Temp->newdir;
 
-    my $init_options = { init => 1 };
-    $init_options->{flavor_class} = $block->flavor_class if $block->flavor_class;
+    my $options = { init => 1 };
+    $options->{flavor_class} = $block->flavor_class if $block->flavor_class;
+    module_setup $options;
 
-    Module::Setup->new(
-        options => $init_options,
-    )->run;
+    module_setup { pack => 1 }, $block->argv;
 
-    $flavor = '';
-    Module::Setup->new(
-        options => { pack => 1 },
-        argv    => $block->argv,
-    )->run;
+    like stdout->[0], qr/@{[ $block->regexp_1 ]}/;
+    like stdout->[0], qr/@{[ $block->regexp_2 ]}/;
+    like stdout->[0], qr/@{[ $block->regexp_3 ]}/;
 
-    like $flavor, qr/@{[ $block->regexp_1 ]}/;
-    like $flavor, qr/@{[ $block->regexp_2 ]}/;
-    like $flavor, qr/@{[ $block->regexp_3 ]}/;
+    clear_tempdir;
 };
 
 __END__
