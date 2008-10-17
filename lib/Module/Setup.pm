@@ -493,6 +493,8 @@ Kazuhiro Osawa E<lt>ko@yappo.ne.jpE<gt>
 
 walf443
 
+hidek
+
 =head1 SEE ALSO
 
 L<Module::Setup::Plugin>, L<module-setup>
