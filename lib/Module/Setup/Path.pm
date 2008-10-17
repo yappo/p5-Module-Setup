@@ -31,7 +31,7 @@ sub set_flavor {
 
 sub flavor         { shift->{flavor} }
 sub flavors        { shift->{flavors} }
-sub global_config  { shift->{global_config} }
+#sub global_config  { shift->{global_config} }
 sub global_plugins { shift->{global_plugins} }
 
 sub is_initialized {
