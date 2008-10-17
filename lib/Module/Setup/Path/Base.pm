@@ -44,11 +44,4 @@ sub find_files {
     } File::Find::Rule->new->relative->in( $self->path );
 }
 
-#sub find_directories {
-#    my $self = shift;
-#    map {
-#        -d $_ ? Module::Setup::Path::Dir->new($_) : Module::Setup::Path::File->new($_)
-#    } File::Find::Rule->new->dir->relative->in( $self->path );
-#}
-
 1;
