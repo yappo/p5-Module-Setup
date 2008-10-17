@@ -32,6 +32,7 @@ sub package       { shift->{package} };
 sub dist_name     { shift->{dist_name} };
 sub dist_path     { shift->{dist_path} };
 sub template_vars { shift->{template_vars} };
+sub install_files { shift->{install_files} };
 
 sub set_template_vars {
     my($self, $vars) = @_;
@@ -42,9 +43,10 @@ sub install_template {
     my($self, $context, $path) = @_;
 
     my $src      = $context->base_dir->flavor->template->path_to($path);
+    my $template = $src->is_dir ? undef : $src->slurp;
     my $options = +{
         dist_path => ($src->is_dir ? $self->dist_path->subdir($path) : $self->dist_path->file($path)),
-        template  => ($src->is_dir ? undef : $src->slurp || undef),
+        template  => $template,
         chmod     => sprintf('%03o', S_IMODE(( stat $src )[2])),
         vars      => $self->template_vars,
         content   => undef,
@@ -60,7 +62,7 @@ sub write_template {
         $context->call_trigger( template_process => $options );
         $options->{template} = delete $options->{content} unless $options->{template};
     }
-    $options->{dist_path} =~ s/____var-(.+)-var____/$options->{vars}->{$1} || $options->{vars}->{config}->{$1}/eg;
+    $options->{dist_path} =~ s/____var-(.+?)-var____/$options->{vars}->{$1} || $options->{vars}->{config}->{$1}/eg;
     $context->call_trigger( replace_distribute_path => $options );
 
     if ($is_dir) {
