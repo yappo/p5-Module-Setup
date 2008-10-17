@@ -423,6 +423,11 @@ sub dialog {
     }
 }
 
+sub system {
+    my($self, @args) = @_;
+    CORE::system @args;
+}
+
 1;
 __END__
 
