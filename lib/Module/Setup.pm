@@ -43,19 +43,19 @@ sub setup_options {
 
     my $options = {};
     GetOptions(
-        'init'             => \($options->{init}),
-        'pack'             => \($options->{pack}),
-        'direct'           => \($options->{direct}),
-        'flavor=s'         => \($options->{flavor}),
-        'flavor-class=s'   => \($options->{flavor_class}),
-        'plugin=s@'        => \($options->{plugins}),
-        'target'           => \($options->{target}),
-        'module-setup-dir' => \($options->{module_setup_dir}),
-        version            => sub {
+        'init'                         => \($options->{init}),
+        'pack'                         => \($options->{pack}),
+        'direct'                       => \($options->{direct}),
+        'flavor|flavour=s'             => \($options->{flavor}),
+        'flavor-class|flavour-class=s' => \($options->{flavor_class}),
+        'plugin=s@'                    => \($options->{plugins}),
+        'target'                       => \($options->{target}),
+        'module-setup-dir'             => \($options->{module_setup_dir}),
+        version                        => sub {
             print "module-setup v$VERSION\n";
             exit 1;
         },
-        help               => sub { pod2usage(1); },
+        help                           => sub { pod2usage(1); },
     ) or pod2usage(2);
 
     $self->{options} = $options;
