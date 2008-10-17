@@ -1,6 +1,5 @@
 use t::Utils;
 use Test::More tests => 6;
-use Fcntl qw( :mode );
 
 module_setup { init => 1 };
 

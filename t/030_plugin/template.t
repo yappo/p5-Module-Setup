@@ -1,6 +1,5 @@
 use t::Utils;
 use Test::More tests => 3;
-use Fcntl qw( :mode );
 
 default_dialog;
 module_setup { target => 1, flavor_class => '+t::Flavor::Simple', plugins => [
