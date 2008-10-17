@@ -1,5 +1,12 @@
 Revision history for Perl extension Module::Setup
 
+0.04    2008-10-17T20:28:25+09:00
+	- add --flavor and --flavor-class options alias of --flavour and --flavour-class options in module-setup command
+	- add too many tests
+	- fixed default MODULE_SETUP dir is broken (hidek++)
+	- fixed plugin config is broken
+	- current directory returns to the original directory on run method
+
 0.03_03 2008-10-16T22:06:19+09:00
         - add empty directory support on flavor
 	- portably perform operations on flavor
