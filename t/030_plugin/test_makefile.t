@@ -61,7 +61,7 @@ dialog {
     for my $code (1..4) {
         local $@;
         @pre_cmds = @stack_test;
-        eval { module_setup { target => 1 }, 'Test::Makefile3' };
+        eval { module_setup { target => 1 }, 'Test::Makefile3_' . $code };
         like $@, qr/$code at /;
     }
 }
