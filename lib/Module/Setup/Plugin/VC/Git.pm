@@ -15,15 +15,15 @@ sub check_skeleton_directory {
     my $self = shift;
     return unless $self->dialog("Git init? [Yn] ", 'y') =~ /[Yy]/;
 
-    !system 'git init' or die $?;
-    !system "git add .gitignore" or die $?;
+    !$self->system('git', 'init')              or die $?;
+    !$self->system('git', 'add', '.gitignore') or die $?;
 
     my $dir = Path::Class::Dir->new('.');
     while (my $path = $dir->next) {
-        next if $path eq '.' || $path eq '..' || $path eq '.git' || $path eq '.gitignore';
-        system 'git', 'add', $path;
+        next if $path eq '.' || $path eq '..' || $path eq '.git';
+        $self->system('git', 'add', $path);
     }
-    !system 'git commit -m "initial commit"' or die $?;
+    !$self->system('git', 'commit', '-m', 'initial commit') or die $?;
 }
 
 1;
