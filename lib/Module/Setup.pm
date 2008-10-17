@@ -135,7 +135,7 @@ sub run {
     $self->load_plugins;
 
     # create skeleton
-    return unless $self->create_skeleton;
+    $self->create_skeleton;
     $self->call_trigger( 'after_create_skeleton' );
 
     # test
@@ -335,9 +335,10 @@ sub _collect_flavor_files {
                 dir => join('/', @path),
             };
         } else {
+            my $body = $type->path_to($file)->slurp;
             push @{ $template }, +{
                 $path_name => join('/', @path),
-                template   => $type->path_to($file)->slurp || '',
+                template   => $body,
             };
         }
     }
