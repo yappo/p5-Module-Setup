@@ -4,6 +4,7 @@ name 'Module-Setup';
 all_from 'lib/Module/Setup.pm';
 
 requires 'Class::Trigger';
+requires 'Cwd';
 requires 'ExtUtils::MakeMaker';
 requires 'File::Basename';
 requires 'File::Find::Rule';

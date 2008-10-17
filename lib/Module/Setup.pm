@@ -7,6 +7,7 @@ our $VERSION = '0.03_03';
 
 use Carp ();
 use Class::Trigger;
+use Cwd ();
 use ExtUtils::MakeMaker qw(prompt);
 use File::HomeDir;
 use File::Path;
@@ -31,8 +32,14 @@ sub new {
 
     $args{options} ||= +{};
     $args{argv}    ||= +[];
+    $args{_current_dir} = Cwd::getcwd;
 
     bless { %args }, $class;
+}
+
+sub DESTROY {
+    my $self = shift;
+    chdir $self->{_current_dir} unless $self->{_current_dir} eq Cwd::getcwd;
 }
 
 sub setup_options {
@@ -130,6 +137,7 @@ sub run {
     chdir $self->distribute->dist_path;
     $self->call_trigger( 'check_skeleton_directory' );
     $self->call_trigger( 'finalize_create_skeleton' );
+    chdir $self->{_current_dir};
 }
 
 
