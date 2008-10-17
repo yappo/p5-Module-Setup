@@ -8,7 +8,7 @@ use Template;
 my $TEMPLATE;
 sub register {
     my($self, ) = @_;
-    $self->{config} ||= +{};
+    $self->{config} = +{} unless $self->{config};
     $TEMPLATE = Template->new(%{ $self->{config} });
     $self->add_trigger( template_process => \&template_process );
 }

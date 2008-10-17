@@ -195,7 +195,7 @@ sub load_plugins {
             eval "require $pkg"; ## no critic
             Carp::croak $@ if $@;
         }
-        $self->{loaded_plugin}->{$pkg} = $pkg->new( context => $self, config => $self->config );
+        $self->{loaded_plugin}->{$pkg} = $pkg->new( context => $self, config => $config );
     }
 }
 
