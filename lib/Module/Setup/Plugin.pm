@@ -6,6 +6,7 @@ use Path::Class;
 use Scalar::Util qw(weaken);
 
 use Module::Setup::Flavor;
+use Module::Setup::Path::Dir;
 
 sub new {
     my($class, %args) = @_;
@@ -24,13 +25,18 @@ sub add_trigger {
 
 sub append_template_file {
     my($self, $context, $caller) = @_;
-    $caller ||= caller;
+    $caller = caller unless $caller;
     my @template = Module::Setup::Flavor::loader($caller);
 
     for my $tmpl (@template) {
-        next unless exists $tmpl->{file};
+        if (exists $tmpl->{dir}) {
+            Module::Setup::Path::Dir->new($context->distribute->dist_path, split('/', $tmpl->{dir}))->mkpath;
+            next;
+        } elsif (!exists $tmpl->{file}) {
+            next;
+        }
         my $options = {
-            dist_path => $context->distribute->dist_path->file($tmpl->{file}),
+            dist_path => $context->distribute->dist_path->file(split('/', $tmpl->{file})),
             template  => $tmpl->{template},
             vars      => $context->distribute->template_vars,
             content   => undef,
