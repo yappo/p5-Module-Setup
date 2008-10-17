@@ -9,14 +9,19 @@ my %data_cache;
 sub loader {
     my $class = shift;
 
-    @{ $data_cache{$class} ||= do {
+    unless ($data_cache{$class}) {
         local $/;
         my $data = eval "package $class; <DATA>"; ## no critic
         Carp::croak "flavor template class is invalid: $class" unless $data;
 
         my @template = YAML::Load(join '', $data);
-        \@template;
-    } };
+        if (scalar(@template) == 1 && !defined $template[0]) {
+            $data_cache{$class} = [];
+        } else {
+            $data_cache{$class} = \@template;
+        }
+    };
+    @{ $data_cache{$class} };
 }
 
 sub import_template {
@@ -30,25 +35,36 @@ sub import_template {
 
     my %template_index;
     my $template_config;
+    my $anthor_key_count = 0;
+ LOOP:
     for my $tmpl (@local_template) {
-        if (exists $tmpl->{file}) {
-            $template_index{'template - '.$tmpl->{file}} = $tmpl;
-        } elsif (exists $tmpl->{plugin}) {
-            $template_index{'plugins - '.$tmpl->{plugin}} = $tmpl;
-        } elsif (exists $tmpl->{config}) {
+        if (exists $tmpl->{config}) {
             $template_config = $tmpl;
+            next;
         }
+        for my $type (qw/ file plugin dir /) {
+            next unless exists $tmpl->{$type};
+            $template_index{"$type - $tmpl->{$type}"} = $tmpl;
+            next LOOP;
+        }
+        $template_index{'anthor - ' . $anthor_key_count++} = $tmpl;
     }
 
     my @template;
+ LOOP:
     for my $tmpl (@base_template) {
-        if (exists $tmpl->{file}) {
-            push @template, (delete $template_index{'template - ' . $tmpl->{file}} || $tmpl);
-        } elsif (exists $tmpl->{plugin}) {
-            push @template, (delete $template_index{'plugins - ' . $tmpl->{plugin}} || $tmpl);
-        } elsif (exists $tmpl->{config} && !defined $template_config) {
-            $template_config = $tmpl;
+        if (exists $tmpl->{config}) {
+            $template_config = $tmpl unless defined $template_config;
+            next;
         }
+        for my $type (qw/ file plugin dir /) {
+            next unless exists $tmpl->{$type};
+            my $template = delete $template_index{"$type - $tmpl->{$type}"};
+            $template = $tmpl unless $template;
+            push @template, $template;
+            next LOOP;
+        }
+        push @template, $tmpl;
     }
 
     for my $tmpl (values %template_index) {
@@ -66,3 +82,5 @@ sub import_template {
 Module::Setup::Flavor - Module::Setup Flavor
 
 =cut
+
+__DATA__
