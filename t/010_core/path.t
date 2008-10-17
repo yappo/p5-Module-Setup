@@ -1,5 +1,5 @@
 use t::Utils;
-use Test::More tests => 5;
+use Test::More tests => 3;
 use Module::Setup::Path;
 
 do {
