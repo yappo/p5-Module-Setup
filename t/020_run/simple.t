@@ -4,12 +4,7 @@ use YAML ();
 
 plan tests => 6 * blocks;
 
-dialog {
-    my($self, $msg, $default) = @_;
-    return 'n' if $msg =~ /Check Makefile.PL\?/i;
-    return 'n' if $msg =~ /Subversion friendly\?/i;
-    return $default;
-};
+default_dialog;
 
 run {
     my $block = shift;

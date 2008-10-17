@@ -11,7 +11,7 @@ sub import {
     my $class  = shift;
     my $caller = caller;
 
-    for my $func (qw/ module_setup stdout dialog setup_dir target_dir clear_tempdir flavors_dir template_dir plugins_dir config_file /) {
+    for my $func (qw/ module_setup stdout dialog default_dialog setup_dir target_dir clear_tempdir flavors_dir template_dir plugins_dir config_file /) {
         no strict 'refs';
         *{"$caller\::$func"} = \&{ $func };
     }
@@ -85,5 +85,15 @@ sub dialog (;&) {
         *Module::Setup::dialog = $code;
     }
 }
+
+sub default_dialog {
+    dialog {
+        my($self, $msg, $default) = @_;
+        return 'n' if $msg =~ /Check Makefile.PL\?/i;
+        return 'n' if $msg =~ /Subversion friendly\?/i;
+        return $default;
+    };
+}
+
 
 1;
