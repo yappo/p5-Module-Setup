@@ -42,11 +42,19 @@ sub DESTROY {
     chdir $self->{_current_dir} unless $self->{_current_dir} eq Cwd::getcwd;
 }
 
+sub _setup_options_pod2usage {
+    pod2usage(1);
+}
+sub _setup_options_version {
+    print "module-setup v$VERSION\n";
+    exit 1;
+}
+
 sub setup_options {
     my($self, %args) = @_;
     $Module::Setup::HAS_TERM = 1;
 
-    pod2usage(2) unless @ARGV;
+    _setup_options_pod2usage unless @ARGV;
 
     my $options = {};
     GetOptions(
@@ -58,12 +66,9 @@ sub setup_options {
         'plugin=s@'                    => \($options->{plugins}),
         'target'                       => \($options->{target}),
         'module-setup-dir'             => \($options->{module_setup_dir}),
-        version                        => sub {
-            print "module-setup v$VERSION\n";
-            exit 1;
-        },
-        help                           => sub { pod2usage(1); },
-    ) or pod2usage(2);
+        version                        => \&_setup_options_version,
+        help                           => \&_setup_options_pod2usage,
+    ) or _setup_options_pod2usage;
 
     $self->{options} = $options;
     $self->{argv}    = \@ARGV;
