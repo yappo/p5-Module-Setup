@@ -425,7 +425,7 @@ sub dialog {
 
 sub system {
     my($self, @args) = @_;
-    CORE::system @args;
+    CORE::system(@args);
 }
 
 1;

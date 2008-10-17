@@ -12,10 +12,10 @@ sub check_skeleton_directory {
     my $self = shift;
     return unless $self->dialog("Check Makefile.PL? [Yn] ", 'y') =~ /[Yy]/;
 
-    !system "perl Makefile.PL" or die $?;
-    !system 'make test'        or die $?;
-    !system 'make manifest'    or die $?;
-    !system 'make distclean'   or die $?;
+    !$self->system('perl', 'Makefile.PL') or die $?;
+    !$self->system('make', 'test')        or die $?;
+    !$self->system('make', 'manifest')    or die $?;
+    !$self->system('make', 'distclean')   or die $?;
 }
 
 1;
