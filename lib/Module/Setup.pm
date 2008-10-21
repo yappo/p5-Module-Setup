@@ -272,8 +272,8 @@ sub create_flavor {
         }
     }
 
-    # plugins
     $self->base_dir->flavor->plugins->path->mkpath;
+    $self->base_dir->flavor->template->path->mkpath;
 
     if (exists $options->{plugins} && $options->{plugins} && @{ $options->{plugins} }) {
         $config->{plugins} ||= [];
@@ -362,7 +362,7 @@ sub pack_flavor {
 
     my $eq = '=';
     my $yaml = YAML::Dump(@{ $template });
-    $self->stdout(<<END);
+    $self->stdout(<<FLAVOR__);
 package $module;
 use strict;
 use warnings;
@@ -379,10 +379,10 @@ ${eq}head1 SYNOPSIS
 
 ${eq}cut
 
-__DATA__
+\__DATA__
 
 $yaml
-END
+FLAVOR__
 }
 
 sub select_flavor {

@@ -3,6 +3,7 @@ use Test::Base;
 use YAML ();
 
 plan tests => 6 * blocks;
+filters { libs => ['yaml'], options => ['yaml'] };
 
 default_dialog;
 
@@ -11,7 +12,8 @@ run {
 
     my $argv = [ $block->module ];
     push @{ $argv }, $block->flavor if $block->flavor;
-    module_setup { target => 1 }, $argv;
+    my $add_options = $block->options || +{};
+    module_setup { %{ $add_options }, target => 1 }, $argv;
 
     ok -d target_dir $block->create_dir;
     ok -d target_dir $block->create_dir, 't';
@@ -31,20 +33,20 @@ __END__
 ===
 --- module: Foo
 --- create_dir: Foo
---- libs yaml
+--- libs
  - Foo.pm
 
 ===
 --- module: Foo::Bar
 --- create_dir: Foo-Bar
---- libs yaml
+--- libs
  - Foo
  - Bar.pm
 
 ===
 --- module: Foo::Bar::Baz_Bla
 --- create_dir: Foo-Bar-Baz_Bla
---- libs yaml
+--- libs
  - Foo
  - Bar
  - Baz_Bla.pm
@@ -53,5 +55,21 @@ __END__
 --- module: Foo
 --- flavor: flavor
 --- create_dir: Foo
---- libs yaml
+--- libs
  - Foo.pm
+
+===
+--- module: Foo
+--- create_dir: Foo
+--- libs
+ - Foo.pm
+--- options
+  plugins:
+
+===
+--- module: Foo
+--- create_dir: Foo
+--- libs
+ - Foo.pm
+--- options
+  plugins: []
