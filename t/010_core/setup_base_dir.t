@@ -1,5 +1,5 @@
 use t::Utils;
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 my $obj = Module::Setup->new;
 
@@ -23,4 +23,11 @@ do {
     $obj->setup_base_dir;
     is $obj->base_dir->path, setup_dir('options');
     ok -d setup_dir('options');
+};
+
+do {
+    no warnings 'redefine';
+    local *Path::Class::Dir::new = sub {};
+    eval { $obj->setup_base_dir };
+    like $@, qr/module_setup directory was not able to be discovered/;
 };

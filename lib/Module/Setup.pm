@@ -102,6 +102,7 @@ sub setup_base_dir {
     } else {
         $path = $self->options->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || Path::Class::Dir->new(File::HomeDir->my_home, '.module-setup');
     }
+    die 'module_setup directory was not able to be discovered.' unless $path;
 
     $self->{base_dir} = Module::Setup::Path->new($path);
     $self->base_dir->init_directories unless $self->base_dir->is_initialized;
