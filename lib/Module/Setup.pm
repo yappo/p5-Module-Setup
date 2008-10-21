@@ -225,7 +225,7 @@ sub write_file {
 }
 
 sub install_flavor {
-    my($self, $name, $tmpl) = @_;
+    my($self, $tmpl) = @_;
 
     my $flavor = $self->base_dir->flavor;
     my $path;
@@ -235,6 +235,8 @@ sub install_flavor {
         return Module::Setup::Path::Dir->new( $flavor->template->path, split('/', $tmpl->{dir}) )->mkpath;
     } elsif (exists $tmpl->{plugin} && $tmpl->{plugin}) {
         $path = $flavor->plugins->path_to(split '/', $tmpl->{plugin});
+    } else {
+        return;
     }
 
     $self->write_file(+{
@@ -266,7 +268,7 @@ sub create_flavor {
         if (exists $tmpl->{config} && ref($tmpl->{config}) eq 'HASH') {
             $config = $tmpl->{config};
         } else {
-            $self->install_flavor($name, $tmpl);
+            $self->install_flavor($tmpl);
         }
     }
 
