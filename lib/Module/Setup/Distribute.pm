@@ -40,9 +40,10 @@ sub set_template_vars {
 }
 
 sub install_template {
-    my($self, $context, $path) = @_;
+    my($self, $context, $path, $base_src) = @_;
 
-    my $src      = $context->base_dir->flavor->template->path_to($path);
+    $base_src = $context->base_dir->flavor->template unless $base_src;
+    my $src      = $base_src->path_to($path);
     my $template = $src->is_dir ? undef : $src->slurp;
     my $options = +{
         dist_path => ($src->is_dir ? $self->dist_path->subdir($path) : $self->dist_path->file($path)),

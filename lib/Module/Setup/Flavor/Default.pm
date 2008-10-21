@@ -183,3 +183,4 @@ config:
     - VC::SVN
     - Template
     - Test::Makefile
+    - Additional

@@ -18,6 +18,7 @@ use Pod::Usage;
 
 use Module::Setup::Distribute;
 use Module::Setup::Path;
+use Module::Setup::Path::Template;
 
 our $HAS_TERM;
 
@@ -63,6 +64,7 @@ sub setup_options {
         'direct'                       => \($options->{direct}),
         'flavor|flavour=s'             => \($options->{flavor}),
         'flavor-class|flavour-class=s' => \($options->{flavor_class}),
+        'additional=s'                 => \($options->{additional}),
         'plugin=s@'                    => \($options->{plugins}),
         'target'                       => \($options->{target}),
         'module-setup-dir'             => \($options->{module_setup_dir}),
@@ -116,7 +118,7 @@ sub run {
     $options->{flavor_class} ||= 'Default';
     $self->setup_base_dir;
 
-    if ($options->{init}) {
+    if ($options->{init} || $options->{additional}) {
         $self->_load_argv( flavor => 'default' );
         return $self->create_flavor;
     }
@@ -228,17 +230,23 @@ sub install_flavor {
     my($self, $tmpl) = @_;
 
     my $flavor = $self->base_dir->flavor;
+    my $template_path = $flavor->template;
+    if (exists $self->options->{additional}) {
+        $template_path = Module::Setup::Path::Template->new($flavor->additional->path, $self->options->{additional});
+        $template_path->path->mkpath;
+    }
+
     my $path;
     if (exists $tmpl->{file} && $tmpl->{file}) {
-        $path = $flavor->template->path_to(split '/', $tmpl->{file});
+        $path = $template_path->path_to(split '/', $tmpl->{file});
     } elsif (exists $tmpl->{dir} && $tmpl->{dir}) {
-        return Module::Setup::Path::Dir->new( $flavor->template->path, split('/', $tmpl->{dir}) )->mkpath;
-    } elsif (exists $tmpl->{plugin} && $tmpl->{plugin}) {
+        return Module::Setup::Path::Dir->new( $template_path->path, split('/', $tmpl->{dir}) )->mkpath;
+    } elsif (exists $tmpl->{plugin} && $tmpl->{plugin} && !exists $self->options->{additional}) {
         $path = $flavor->plugins->path_to(split '/', $tmpl->{plugin});
     } else {
         return;
     }
-
+    
     $self->write_file(+{
         dist_path => $path,
         %{ $tmpl },
@@ -260,7 +268,7 @@ sub create_flavor {
     my $flavor_class = $self->_load_flavor_class($options->{flavor_class});
 
     $self->base_dir->set_flavor($name);
-    Carp::croak "create flavor: $name exists " if $self->base_dir->flavor->is_exists;
+    Carp::croak "create flavor: $name exists " if $self->base_dir->flavor->is_exists && !exists $options->{additional};
 
     my @template = $flavor_class->loader;
     my $config = +{};
@@ -271,9 +279,11 @@ sub create_flavor {
             $self->install_flavor($tmpl);
         }
     }
+    return 1 if $options->{additional};
 
     $self->base_dir->flavor->plugins->path->mkpath;
     $self->base_dir->flavor->template->path->mkpath;
+    $self->base_dir->flavor->additional->path->mkpath;
 
     if (exists $options->{plugins} && $options->{plugins} && @{ $options->{plugins} }) {
         $config->{plugins} ||= [];
@@ -474,10 +484,13 @@ importing redistributed flavor
 
   $ module-setup --init --flavor-class=+MyFlavorCatalystAction new_flavor
 
+install additional template
+
+  $ module-setup --flavor-class=+MyFlavorCatalystDBIC --additional=DBIC flavorname
+
 for git
 
   $ module-setup --plugin=VC::Git Foo::Bar # or edit your ~/.module-setup/flavor/foo/config.yaml
-
 
 =head1 DESCRIPTION
 
