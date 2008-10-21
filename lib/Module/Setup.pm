@@ -123,10 +123,10 @@ sub run {
 
     $self->_load_argv( module => '' );
     $self->_load_argv( flavor => sub { $self->select_flavor } );
-    $self->base_dir->set_flavor($options->{flavor});
 
     Carp::croak "flavor name is required" unless $options->{flavor};
     Carp::croak "module name is required" unless $options->{module};
+    $self->base_dir->set_flavor($options->{flavor});
 
     return $self->pack_flavor if $options->{pack};
 
