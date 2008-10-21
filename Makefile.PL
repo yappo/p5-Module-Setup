@@ -24,6 +24,7 @@ requires 'Module::Install::AuthorTests';
 
 tests 't/*.t t/*/*.t';
 
+build_requires 'IO::Scalar';
 build_requires 'Test::More';
 use_test_base;
 auto_include;
