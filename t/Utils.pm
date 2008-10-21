@@ -7,9 +7,13 @@ use Path::Class;
 
 use Module::Setup;
 
+my $stdout = [];
+sub stdout { $stdout }
+
 sub import {
     my $class  = shift;
     my $caller = caller;
+    my %args   = @_;
 
     for my $func (qw/ module_setup stdout dialog default_dialog setup_dir target_dir clear_tempdir flavors_dir template_dir plugins_dir config_file /) {
         no strict 'refs';
@@ -18,6 +22,11 @@ sub import {
 
     strict->import;
     warnings->import;
+
+    unless ($args{without_stdout}) {
+        no warnings 'redefine';
+        *Module::Setup::stdout = sub { push @{ $stdout }, $_[1] };
+    }
 }
 
 sub _path_dir (@) {
@@ -54,13 +63,6 @@ sub clear_tempdir {
     $setup_dir  = undef;
     $target_dir = undef;
 }
-
-my $stdout = [];
-{
-    no warnings 'redefine';
-    *Module::Setup::stdout = sub { push @{ $stdout }, $_[1] };
-}
-sub stdout { $stdout }
 
 my $context;
 sub context { $context }
