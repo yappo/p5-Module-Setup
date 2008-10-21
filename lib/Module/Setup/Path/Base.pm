@@ -32,6 +32,7 @@ sub path_to {
 
 sub find_files {
     my $self = shift;
+    return unless $self->path->children;
     map {
         my $path = Path::Class::Dir->new($self->path, $_);
         my $ret;
