@@ -62,6 +62,8 @@ my $stdout = [];
 }
 sub stdout { $stdout }
 
+my $context;
+sub context { $context }
 sub module_setup ($@) {
     $stdout = [];
     my($options, @argv) = @_;
@@ -72,10 +74,11 @@ sub module_setup ($@) {
         $options->{target} = target_dir;
     }
 
-    Module::Setup->new(
+    $context = Module::Setup->new(
         options => $options,
         argv => \@argv,
-    )->run;
+    );
+    $context->run;
 }
 
 sub dialog (;&) {
