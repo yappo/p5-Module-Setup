@@ -65,6 +65,7 @@ sub setup_options {
         'flavor|flavour=s'             => \($options->{flavor}),
         'flavor-class|flavour-class=s' => \($options->{flavor_class}),
         'additional=s'                 => \($options->{additional}),
+        'without-additional'           => \($options->{without_additional}),
         'plugin=s@'                    => \($options->{plugins}),
         'target'                       => \($options->{target}),
         'module-setup-dir'             => \($options->{module_setup_dir}),
@@ -118,7 +119,7 @@ sub run {
     $options->{flavor_class} ||= 'Default';
     $self->setup_base_dir;
 
-    if ($options->{init} || $options->{additional}) {
+    if ($options->{init} || (!$options->{pack} && $options->{additional})) {
         $self->_load_argv( flavor => 'default' );
         return $self->create_flavor;
     }
@@ -129,6 +130,10 @@ sub run {
     Carp::croak "flavor name is required" unless $options->{flavor};
     Carp::croak "module name is required" unless $options->{module};
     $self->base_dir->set_flavor($options->{flavor});
+
+    if (exists $options->{additional} && !-d $self->base_dir->flavor->additional->path_to($options->{additional})) {
+        Carp::croak "additional template is no exist: $options->{additional}";
+    }
 
     return $self->pack_flavor if $options->{pack};
 
@@ -231,8 +236,8 @@ sub install_flavor {
 
     my $flavor = $self->base_dir->flavor;
     my $template_path = $flavor->template;
-    if (exists $self->options->{additional}) {
-        $template_path = Module::Setup::Path::Template->new($flavor->additional->path, $self->options->{additional});
+    if (exists $tmpl->{additional}) {
+        $template_path = Module::Setup::Path::Template->new($flavor->additional->path, $tmpl->{additional});
         $template_path->path->mkpath;
     }
 
@@ -241,7 +246,7 @@ sub install_flavor {
         $path = $template_path->path_to(split '/', $tmpl->{file});
     } elsif (exists $tmpl->{dir} && $tmpl->{dir}) {
         return Module::Setup::Path::Dir->new( $template_path->path, split('/', $tmpl->{dir}) )->mkpath;
-    } elsif (exists $tmpl->{plugin} && $tmpl->{plugin} && !exists $self->options->{additional}) {
+    } elsif (exists $tmpl->{plugin} && $tmpl->{plugin} && !exists $tmpl->{additional}) {
         $path = $flavor->plugins->path_to(split '/', $tmpl->{plugin});
     } else {
         return;
@@ -276,6 +281,13 @@ sub create_flavor {
         if (exists $tmpl->{config} && ref($tmpl->{config}) eq 'HASH') {
             $config = $tmpl->{config};
         } else {
+            my $additional;
+            if (exists $tmpl->{additional}) {
+                $additional = $tmpl->{additional};
+            } elsif (exists $options->{additional}) {
+                $additional = $options->{additional};
+            }
+            local $tmpl->{additional} = $additional if $additional; ## no critic;
             $self->install_flavor($tmpl);
         }
     }
@@ -369,6 +381,24 @@ sub pack_flavor {
     push @{ $template }, +{
         config => YAML::LoadFile($self->base_dir->flavor->config->path),
     };
+
+    unless ($config->{without_additional}) {
+        $template = [] if $config->{additional};
+        for my $additional ( $self->base_dir->flavor->additional->path->children ) {
+            next unless $additional->is_dir;
+            my $name = $additional->dir_list(-1);
+            next if exists $config->{additional} && $name ne $config->{additional};
+            my $base_path = Module::Setup::Path::Template->new($self->base_dir->flavor->additional->path, $name);
+
+            my $templates = [];
+            $self->_collect_flavor_files($templates, file => $base_path);
+            if (exists $config->{additional}) {
+                push @{ $template }, @{ $templates };
+            } else {
+                push @{ $template }, map { $_->{additional} = $name; $_ } @{ $templates };
+            }
+        }
+    }
 
     my $eq = '=';
     my $yaml = YAML::Dump(@{ $template });
@@ -486,7 +516,15 @@ importing redistributed flavor
 
 install additional template
 
-  $ module-setup --flavor-class=+MyFlavorCatalystDBIC --additional=DBIC flavorname
+  $ module-setup --flavor-class=+MyFlavorCatalystDBIC --additional=DBIC catalyst
+
+redistribute pack for additional template
+
+  $ module-setup --pack --additional=DBIC MyFlavorCatalystDBIC catalyst > MyFlavorCatalystDBIC.pm
+
+redistribute pack without additional template
+
+  $ module-setup --pack --without-additional MyFlavorCatalyst catalyst > MyFlavorCatalyst.pm
 
 for git
 

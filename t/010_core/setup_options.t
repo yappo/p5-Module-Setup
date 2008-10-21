@@ -20,6 +20,7 @@ run {
         flavor             => undef,
         init               => undef,
         additional         => undef,
+        without_additional => undef,
         %{ $block->options || {} },
     };
 
@@ -96,3 +97,21 @@ Foo
 --- options
 additional: Add
 flavor_class: Flavor
+
+===
+--- input
+--pack
+--additional=Add
+--- argv
+--- options
+pack: 1
+additional: Add
+
+===
+--- input
+--pack
+--without-additional
+--- argv
+--- options
+pack: 1
+without_additional: 1

@@ -1,5 +1,5 @@
 use t::Utils;
-use Test::More tests => 8;
+use Test::More tests => 12;
 
 default_dialog;
 module_setup { init => 1 };
@@ -32,4 +32,13 @@ do {
     ok -d target_dir 'Add';
     ok -f target_dir('Add')->file('additional.txt');
     like target_dir('Add')->file('additional.txt')->slurp, qr/additional file/;
+};
+
+do {
+    module_setup { init => 1, flavor_class => '+t::Flavor::WithAdditional' }, 'withflavor';
+
+    ok -d additional_dir('withflavor', 'with');
+    ok -f additional_dir('withflavor', 'with')->file('wadditional.txt');
+    like additional_dir('withflavor', 'with')->file('wadditional.txt')->slurp, qr/additional wfile/;
+    ok -d additional_dir('withflavor', 'with', 'waddir');
 };

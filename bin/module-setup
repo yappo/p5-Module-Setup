@@ -28,11 +28,14 @@ module-setup --direct MyApp # use Module::Setup::Flavor::Default
 module-setup --direct --flavor-class=+My::Flavor MyApp
 
 module-setup --additional=DBIC --flavor-class=Additional::Flavor::DBIC default
+module-setup --pack --additional=DBIC MyFlavorCatalystDBIC catalyst > MyFlavorCatalystDBIC.pm
+module-setup --pack --without-additional MyFlavorCatalyst catalyst > MyFlavorCatalyst.pm
 
 Options:
 
     --init                     Create new flavor
     --pack                     Pack flavor
+      --without-additional     without additional template in pack
     --direct                   unuse flavor directory
     --target=dir               set the target directory for skeleton
     --flavor=flavor            Change to flavor
@@ -40,7 +43,7 @@ Options:
     --flavor-class=base_class  Change to flavor class
                                    (default is 'Module::Setup::Flavor::Default')
     --plugin=plugin_name       add using plugin
-    --additional=name           additional template name (use L<Module::Setup::Plugin::Additional>)
+    --additional=name          additional template name (use L<Module::Setup::Plugin::Additional>)
     --help                     Show this message
 
 =cut
