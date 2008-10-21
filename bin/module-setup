@@ -40,7 +40,7 @@ Options:
     --flavor-class=base_class  Change to flavor class
                                    (default is 'Module::Setup::Flavor::Default')
     --plugin=plugin_name       add using plugin
-    -additional=name           additional template name (use L<Module::Setup::Plugin::Additional>)
+    --additional=name           additional template name (use L<Module::Setup::Plugin::Additional>)
     --help                     Show this message
 
 =cut
