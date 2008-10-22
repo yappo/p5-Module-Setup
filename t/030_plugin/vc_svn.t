@@ -10,7 +10,7 @@ dialog {
     is $default, 'y';
     'y';
 };
-module_setup { target => 1 }, 'VC::SVN';
+module_setup { target => 1, plugins => ['VC::SVN'] }, 'VC::SVN';
 ok -d target_dir('VC-SVN', 'trunk');
 ok -d target_dir('VC-SVN', 'branches');
 ok -d target_dir('VC-SVN', 'tags');
