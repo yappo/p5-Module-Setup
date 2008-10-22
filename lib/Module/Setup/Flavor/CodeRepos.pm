@@ -12,7 +12,7 @@ sub loader {
 
 =head1
 
-Module::Setup::Flavor::Default - default flavor
+Module::Setup::Flavor::CodeRepos - coderepos flavor
 
 =head1 SYNOPSIS
 
