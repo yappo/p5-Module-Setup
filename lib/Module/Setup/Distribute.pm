@@ -22,10 +22,12 @@ sub new {
     $self->{base_path}   = Module::Setup::Path::Dir->new($target, $self->{dist_name});
     $self->{dist_path}   = Module::Setup::Path::Dir->new($target, $self->{dist_name});
     $self->{module_path} = join '/', @{ $self->{package} };
+    $self->{additionals} = [];
 
     $self;
 }
 
+sub additionals   { shift->{additionals} };
 sub module        { shift->{module} };
 sub module_path   { shift->{module_path} };
 sub package       { shift->{package} };

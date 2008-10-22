@@ -2,7 +2,7 @@ use t::Utils;
 use Test::Base;
 use YAML ();
 
-plan tests => 6 * blocks;
+plan tests => 9 * blocks;
 
 run {
     my $block = shift;
@@ -13,7 +13,10 @@ run {
     ok -d plugins_dir  $block->create_dir;
     ok -d template_dir $block->create_dir;
     ok -d additional_dir $block->create_dir;
+    ok -f additional_config_file $block->create_dir;
+    is ref(YAML::LoadFile(additional_config_file($block->create_dir))), 'HASH';
     ok -f config_file  $block->create_dir;
+    is ref(YAML::LoadFile(config_file($block->create_dir))), 'HASH';
 
     my $yaml = YAML::LoadFile(config_file  $block->create_dir);
     is ref($yaml), 'HASH';

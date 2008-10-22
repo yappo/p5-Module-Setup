@@ -13,6 +13,7 @@ sub register {
 sub append_template_file {
     my $self = shift;
 
+    my $config = $self->base_dir->flavor->additional->config->load;
     for my $additional ( $self->base_dir->flavor->additional->path->children ) {
         next unless $additional->is_dir;
         my $name = $additional->dir_list(-1);
@@ -22,6 +23,7 @@ sub append_template_file {
         for my $path ($base_src->find_files) {
             $self->distribute->install_template($self, $path, $base_src);
         }
+        push @{ $self->distribute->{additionals} }, $config->{$name};
     }
 }
 

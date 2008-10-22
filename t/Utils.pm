@@ -15,7 +15,7 @@ sub import {
     my $caller = caller;
     my %args   = @_;
 
-    for my $func (qw/ module_setup stdout dialog default_dialog setup_dir target_dir clear_tempdir flavors_dir template_dir additional_dir plugins_dir config_file /) {
+    for my $func (qw/ module_setup stdout dialog default_dialog setup_dir target_dir clear_tempdir flavors_dir template_dir additional_dir additional_config_file plugins_dir config_file /) {
         no strict 'refs';
         *{"$caller\::$func"} = \&{ $func };
     }
@@ -47,6 +47,10 @@ sub template_dir {
 sub additional_dir {
     my $flavor = shift;
     flavors_dir($flavor, 'additional', @_);
+}
+sub additional_config_file {
+    my $flavor = shift;
+    additional_dir($flavor)->file('config.yaml');
 }
 sub plugins_dir {
     my $flavor = shift;

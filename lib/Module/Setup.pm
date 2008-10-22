@@ -277,6 +277,10 @@ sub create_flavor {
 
     my @template = $flavor_class->loader;
     my $config = +{};
+    my $additional_config = +{};
+    if (exists $options->{additional}) {
+        $additional_config = $self->base_dir->flavor->additional->config->load;
+    }
     for my $tmpl (@template) {
         if (exists $tmpl->{config} && ref($tmpl->{config}) eq 'HASH') {
             $config = $tmpl->{config};
@@ -288,14 +292,20 @@ sub create_flavor {
                 $additional = $options->{additional};
             }
             local $tmpl->{additional} = $additional if $additional; ## no critic;
+            if ($additional) {
+                $additional_config->{$additional} = +{
+                    class => $flavor_class,
+                };
+            }
             $self->install_flavor($tmpl);
         }
     }
+    $self->base_dir->flavor->additional->path->mkpath;
+    $self->base_dir->flavor->additional->config->dump($additional_config);
     return 1 if $options->{additional};
 
     $self->base_dir->flavor->plugins->path->mkpath;
     $self->base_dir->flavor->template->path->mkpath;
-    $self->base_dir->flavor->additional->path->mkpath;
 
     if (exists $options->{plugins} && $options->{plugins} && @{ $options->{plugins} }) {
         $config->{plugins} ||= [];
