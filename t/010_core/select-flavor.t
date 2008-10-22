@@ -23,12 +23,16 @@ do {
         my($msg, $default) = @_;
         shift @ans;
     };
+    my $selected;
     local *Module::Setup::log = sub {
         my($self, $msg) = @_;
-        like $msg, qr/You chose flavor: one/;
+        my $re = qr/You chose flavor: (one|two)/;
+        like $msg, $re;
+        $msg =~ $re;
+        $selected = $1;
     };
 
     ok @ans;
-    is t::Utils::context->select_flavor, 'one';
+    is t::Utils::context->select_flavor, $selected;
     ok !@ans;
 };
