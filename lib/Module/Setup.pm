@@ -131,7 +131,7 @@ sub run {
     Carp::croak "module name is required" unless $options->{module};
     $self->base_dir->set_flavor($options->{flavor});
 
-    if (exists $options->{additional} && !-d $self->base_dir->flavor->additional->path_to($options->{additional})) {
+    if ($options->{additional} && !-d $self->base_dir->flavor->additional->path_to($options->{additional})) {
         Carp::croak "additional template is no exist: $options->{additional}";
     }
 
@@ -278,7 +278,7 @@ sub create_flavor {
     my @template = $flavor_class->loader;
     my $config = +{};
     my $additional_config = +{};
-    if (exists $options->{additional}) {
+    if ($options->{additional}) {
         $additional_config = $self->base_dir->flavor->additional->config->load;
     }
     for my $tmpl (@template) {
@@ -288,7 +288,7 @@ sub create_flavor {
             my $additional;
             if (exists $tmpl->{additional}) {
                 $additional = $tmpl->{additional};
-            } elsif (exists $options->{additional}) {
+            } elsif ($options->{additional}) {
                 $additional = $options->{additional};
             }
             local $tmpl->{additional} = $additional if $additional; ## no critic;
@@ -397,12 +397,12 @@ sub pack_flavor {
         for my $additional ( $self->base_dir->flavor->additional->path->children ) {
             next unless $additional->is_dir;
             my $name = $additional->dir_list(-1);
-            next if exists $config->{additional} && $name ne $config->{additional};
+            next if $config->{additional} && $name ne $config->{additional};
             my $base_path = Module::Setup::Path::Template->new($self->base_dir->flavor->additional->path, $name);
 
             my $templates = [];
             $self->_collect_flavor_files($templates, file => $base_path);
-            if (exists $config->{additional}) {
+            if ($config->{additional}) {
                 push @{ $template }, @{ $templates };
             } else {
                 push @{ $template }, map { $_->{additional} = $name; $_ } @{ $templates };
