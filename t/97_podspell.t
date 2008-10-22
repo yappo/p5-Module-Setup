@@ -12,3 +12,6 @@ Tatsuhiko
 pmsetup
 walf
 hidek
+tokuhirom
+dann
+coderepos

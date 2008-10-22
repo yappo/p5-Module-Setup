@@ -590,6 +590,8 @@ walf443
 
 hidek
 
+tokuhirom
+
 =head1 SEE ALSO
 
 L<Module::Setup::Plugin>, L<module-setup>
