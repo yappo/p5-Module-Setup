@@ -16,6 +16,7 @@ requires 'Module::Collect' => 0.04;
 requires 'Path::Class';
 requires 'Pod::Usage';
 requires 'Scalar::Util';
+requires 'Storable';
 requires 'Template'        => 2.20;
 requires 'YAML';
 

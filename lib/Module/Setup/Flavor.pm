@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Carp ();
+use Storable ();
 use YAML ();
 
 my %data_cache;
@@ -21,7 +22,7 @@ sub loader {
             $data_cache{$class} = \@template;
         }
     };
-    @{ $data_cache{$class} };
+    @{ Storable::dclone($data_cache{$class}) };
 }
 
 sub import_template {
