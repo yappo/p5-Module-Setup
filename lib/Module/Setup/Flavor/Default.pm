@@ -2,6 +2,30 @@ package Module::Setup::Flavor::Default;
 use strict;
 use warnings;
 use base 'Module::Setup::Flavor';
+
+
+sub setup_config {
+    my($class, $context, $config) = @_;
+
+    my %vcs = (
+        SVN => 'VC::SVN',
+        SVK => 'VC::SVK',
+        Git => 'VC::Git',
+    );
+
+    for my $name (qw/ SVN SVK Git /) {
+        my $pkg = $vcs{$name};
+        next unless $context->dialog("Do you use $name? [yN]", 'n') =~ /[Yy]/;
+        $context->log("You chose version control system: $name");
+
+        next if grep {
+            ( ref($_) eq 'HASH' && $_->{module} eq $pkg) || $_ eq $pkg
+        } @{ $config->{plugins} };
+
+        push @{ $config->{plugins} }, $pkg;
+    }
+}
+
 1;
 
 =head1
