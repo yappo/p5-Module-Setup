@@ -31,7 +31,7 @@ sub check_skeleton_directory {
 
 =head1 NAME
 
-Module::Setup - a simple module maker "yet another Module::Start(?:er)?"
+Module::Setup::Plugin::VC::Git - Git plugin
 
 =head1 SYNOPSIS
 
