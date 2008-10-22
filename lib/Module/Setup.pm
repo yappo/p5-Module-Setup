@@ -223,9 +223,16 @@ sub write_file {
         $path->dir->mkpath;
     }
 
+    my $template;
+    if ($opts->{is_binary}) {
+        $template = pack 'H*', $opts->{template};
+    } else {
+        $template = $opts->{template};
+    }
+
     $self->log("Creating $path");
     my $out = $path->openw;
-    $out->print($opts->{template});
+    $out->print($template);
     $out->close;
 
     chmod oct($opts->{chmod}), $path if $opts->{chmod};
@@ -251,7 +258,7 @@ sub install_flavor {
     } else {
         return;
     }
-    
+
     $self->write_file(+{
         dist_path => $path,
         %{ $tmpl },
@@ -371,10 +378,15 @@ sub _collect_flavor_files {
             };
         } else {
             my $body = $type->path_to($file)->slurp;
-            push @{ $template }, +{
+            my $tmpl = +{
                 $path_name => join('/', @path),
                 template   => $body,
             };
+            if (-B $type->path_to($file)) {
+                $tmpl->{template}  = unpack 'H*', $body;
+                $tmpl->{is_binary} = 1;
+            }
+            push @{ $template }, $tmpl;
         }
     }
 }

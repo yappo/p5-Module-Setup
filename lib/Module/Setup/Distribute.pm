@@ -54,6 +54,7 @@ sub install_template {
         vars      => $self->template_vars,
         content   => undef,
     };
+    $options->{content} = delete $options->{template} if -B $src;
     $self->write_template($context, $options);
 }
 
