@@ -1,4 +1,5 @@
 package t::Flavor::Null;
+use base 'Module::Setup::Flavor';
 
 sub loader {
     (

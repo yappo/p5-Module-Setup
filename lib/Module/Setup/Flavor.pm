@@ -75,6 +75,15 @@ sub import_template {
     @template;
 }
 
+sub setup_config {
+    my($class, $context, $config) = @_;
+}
+
+sub setup_additional {
+    my($class, $context, $config) = @_;
+}
+
+
 1;
 
 =head1 NAME

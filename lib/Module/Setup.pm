@@ -307,9 +307,14 @@ sub create_flavor {
             $self->install_flavor($tmpl);
         }
     }
+
     $self->base_dir->flavor->additional->path->mkpath;
     $self->base_dir->flavor->additional->config->dump($additional_config);
-    return 1 if $options->{additional};
+
+    if ($options->{additional}) {
+        $flavor_class->setup_additional($self, $config);
+        return 1;
+    }
 
     $self->base_dir->flavor->plugins->path->mkpath;
     $self->base_dir->flavor->template->path->mkpath;
@@ -319,6 +324,8 @@ sub create_flavor {
         push @{ $config->{plugins} }, @{ delete $options->{plugins} };
     }
     $config->{plugins} ||= [];
+
+    $flavor_class->setup_config($self, $config);
 
     # load plugins
     local $self->{config} = +{
