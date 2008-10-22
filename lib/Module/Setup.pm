@@ -27,6 +27,7 @@ sub config     { shift->{config} }
 sub options    { shift->{options} }
 sub base_dir   { shift->{base_dir} }
 sub distribute { shift->{distribute} }
+sub plugins_stash { shift->{plugins_stash} }
 
 sub new {
     my($class, %args) = @_;
@@ -35,7 +36,11 @@ sub new {
     $args{argv}    ||= +[];
     $args{_current_dir} = Cwd::getcwd;
 
-    bless { %args }, $class;
+    my $self = bless { %args }, $class;
+    $self->{_current_dir}  = Cwd::getcwd;
+    $self->{plugins_stash} = +{};
+
+    $self;
 }
 
 sub DESTROY {
@@ -151,6 +156,9 @@ sub run {
     $self->call_trigger( 'check_skeleton_directory' );
     $self->call_trigger( 'finalize_create_skeleton' );
     chdir $self->{_current_dir};
+
+    $self->call_trigger( 'finish_of_run' );
+    $self;
 }
 
 

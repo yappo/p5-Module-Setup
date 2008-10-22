@@ -32,6 +32,7 @@ sub module        { shift->{module} };
 sub module_path   { shift->{module_path} };
 sub package       { shift->{package} };
 sub dist_name     { shift->{dist_name} };
+sub base_path     { shift->{base_path} };
 sub dist_path     { shift->{dist_path} };
 sub template_vars { shift->{template_vars} };
 sub install_files { shift->{install_files} };

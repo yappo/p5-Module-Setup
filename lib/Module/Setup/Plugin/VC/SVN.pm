@@ -15,6 +15,9 @@ sub after_setup_module_attribute {
     if ($self->dialog("Subversion friendly? [Yn] ", 'y') =~ /[Yy]/) {
         $self->distribute->dist_path->subdir($_)->mkpath for (qw/ trunk tags branches /);
         $self->distribute->{dist_path} = Module::Setup::Path::Dir->new($self->distribute->dist_path, 'trunk');
+        $self->plugins_stash->{'VC::SVN'} = +{
+            is_subversion_friendly => 1,
+        };
     }
 }
 

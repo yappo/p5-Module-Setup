@@ -90,7 +90,11 @@ after create_skeleton
 
 =head2 finalize_create_skeleton
 
-last trigger of run method
+last trigger of run method on skeleton directory
+
+=head2 finish_of_run
+
+last hook of run method L<Module::Setup::Plugin::VC::SVK>
 
 =head1 Plugin Example
 
