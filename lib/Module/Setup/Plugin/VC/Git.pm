@@ -28,7 +28,20 @@ sub check_skeleton_directory {
 
 1;
 
-# original http://gist.github.com/13374 by dann
+
+=head1 NAME
+
+Module::Setup - a simple module maker "yet another Module::Start(?:er)?"
+
+=head1 SYNOPSIS
+
+  module-setup --init --plugin=VC::Git
+
+=head1 SEE ALSO
+
+original L<http://gist.github.com/13374> by dann
+
+=cut
 
 __DATA__
 
