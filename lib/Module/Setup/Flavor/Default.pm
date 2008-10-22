@@ -24,6 +24,16 @@ sub setup_config {
 
         push @{ $config->{plugins} }, $pkg;
     }
+
+    if(grep {
+        ( ref($_) eq 'HASH' && $_->{module} eq 'VC::SVK') || $_ eq 'VC::SVK'
+    } @{ $config->{plugins} }) {
+        my @plugins = grep {
+            !(( ref($_) eq 'HASH' && $_->{module} eq 'VC::SVN') || $_ eq 'VC::SVN')
+        } @{ $config->{plugins} };
+        $config->{plugins} = \@plugins;
+    }
+
 }
 
 1;
