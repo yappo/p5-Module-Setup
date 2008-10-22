@@ -1,5 +1,11 @@
 Revision history for Perl extension Module::Setup
 
+0.05    2008-10-22T19:16:50+09:00
+	- additional template support
+	- binary file support
+        - fixed plugin (required use base 'M::P::Plugin' and config uses hash reference)
+        - fixed broken when there is not MODULE_SETUP_DIR
+
 0.04    2008-10-17T20:28:25+09:00
 	- add --flavor and --flavor-class options alias of --flavour and --flavour-class options in module-setup command
 	- add too many tests
