@@ -12,6 +12,10 @@ Module::Setup::Flavor::CatalystStarter - catalyst.pl flavor
 
   MyCatalyst-setup --init --flavor-class=CatalystStarter new_flavor
 
+=head1 SEE ALSO
+
+L<Catalyst::Helper>
+
 =cut
 
 __DATA__
