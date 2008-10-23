@@ -644,14 +644,12 @@ template: 89504e470d0a1a0a0000000d4948445200000078000000320803000000a079efea0000
 ---
 plugin: Catalyst.pm
 template: |+
-  package Module::Setup::Plugin::Catalyst;
+  package OreOre::Hide::Module::Setup::Plugin::Catalyst;
   use strict;
   use warnings;
   use base 'Module::Setup::Plugin';
   
   use Catalyst::Utils;
-  use Catalyst::Devel;
-  use File::Spec;
   use Config;
   
   sub register {
@@ -661,6 +659,29 @@ template: |+
           'after_setup_template_vars' => \&after_setup_template_vars );
   }
   
+  sub after_setup_template_vars {
+      my ( $self, $config ) = @_;
+  
+      my $name = $self->distribute->{module};
+      my $new_config = +{
+          cat_name             => $name,
+          cat_dir              => $self->distribute->{dist_path},
+          cat_script           => $self->distribute->{dist_path}->subdir('script'),
+          cat_appprefix        => Catalyst::Utils::appprefix($name),
+          cat_appenv           => Catalyst::Utils::class2env($name),
+          cat_startperl        => "#!$Config{perlpath} -w",
+          cat_scriptgen        => $Catalyst::Devel::CATALYST_SCRIPT_GEN || 4,
+          cat_catalyst_version => $Catalyst::VERSION,
+          cat_rootname         => "$name\::Controller::Root",
+          cat_base             => $self->distribute->{dist_path}->absolute,
+          cat_path             => Module::Setup::Path::Dir->new( 'lib', split( '::', $name ) ),
+      };
+      $new_config->{cat_path} .= '.pm';
+  
+      while (my($key, $val) = each %{ $new_config }) {
+          $config->{$key} = $val;
+      }
+  }
   sub after_setup_template_vars {
       my ( $self, $config ) = @_;
   
@@ -688,6 +709,6 @@ config:
   plugins:
     - Config::Basic
     - Template
-    - Catalyst
+    - +OreOre::Hide::Module::Setup::Plugin::Catalyst
 
 
