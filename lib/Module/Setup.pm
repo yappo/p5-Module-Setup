@@ -370,6 +370,7 @@ sub create_skeleton {
         dist        => $self->distribute->dist_name,
         module_path => $self->distribute->module_path,
         config      => $config,
+        distribute  => $self->distribute,
         localtime   => scalar localtime,
     };
     $self->call_trigger( after_setup_template_vars => $template_vars);
