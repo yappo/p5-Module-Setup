@@ -682,25 +682,6 @@ template: |+
           $config->{$key} = $val;
       }
   }
-  sub after_setup_template_vars {
-      my ( $self, $config ) = @_;
-  
-      my $name = $self->distribute->{module};
-      $config->{cat_name}      = $name;
-      $config->{cat_dir}       = $self->distribute->{dist_path};
-      $config->{cat_script}    = File::Spec->catdir( $config->{cat_dir}, 'script' );
-      $config->{cat_appprefix} = Catalyst::Utils::appprefix($name);
-      $config->{cat_appenv}    = Catalyst::Utils::class2env($name);
-      $config->{cat_startperl} = "#!$Config{perlpath} -w";
-      $config->{cat_scriptgen} = $Catalyst::Devel::CATALYST_SCRIPT_GEN || 4;
-      $config->{cat_catalyst_version} = $Catalyst::VERSION;
-      $config->{cat_rootname}         = "$name\::Controller::Root";
-      $config->{cat_base} = File::Spec->rel2abs( $config->{cat_dir} );
-      $config->{cat_path}
-          = File::Spec->catfile( 'lib', split( '::', $config->{cat_name} ) );
-      $config->{cat_path} .= '.pm';
-  
-  }
   
   1;
 
