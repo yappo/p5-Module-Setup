@@ -142,7 +142,9 @@ sub run {
 
     return $self->pack_flavor if $options->{pack};
 
-    $self->create_flavor unless $self->base_dir->flavor->is_dir;
+    unless ($self->base_dir->flavor->is_dir) {
+        return unless $self->create_flavor;
+    }
 
     $self->load_config;
     $self->load_plugins;
@@ -289,6 +291,7 @@ sub create_flavor {
 
     $self->base_dir->set_flavor($name);
     Carp::croak "create flavor: $name exists " if $self->base_dir->flavor->is_exists && !exists $options->{additional};
+    return unless $flavor_class->setup_flavor($self);
 
     my @template = $flavor_class->loader;
     my $config = +{};

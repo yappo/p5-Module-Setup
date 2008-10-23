@@ -76,6 +76,8 @@ sub import_template {
     @template;
 }
 
+sub setup_flavor { 1 }
+
 sub setup_config {
     my($class, $context, $config) = @_;
 }
