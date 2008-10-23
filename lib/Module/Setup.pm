@@ -319,6 +319,7 @@ sub create_flavor {
             $self->install_flavor($tmpl);
         }
     }
+    $config->{class} = $flavor_class;
 
     $self->base_dir->flavor->additional->path->mkpath;
     $self->base_dir->flavor->additional->config->dump($additional_config);

@@ -16,10 +16,13 @@ run {
     ok -f additional_config_file $block->create_dir;
     is ref(YAML::LoadFile(additional_config_file($block->create_dir))), 'HASH';
     ok -f config_file  $block->create_dir;
-    is ref(YAML::LoadFile(config_file($block->create_dir))), 'HASH';
 
-    my $yaml = YAML::LoadFile(config_file  $block->create_dir);
-    is ref($yaml), 'HASH';
+    my $config = YAML::LoadFile(config_file $block->create_dir);
+    is ref($config), 'HASH';
+
+    my $flavor_class = $block->flavor_class || 'Default';
+    $flavor_class = "Module::Setup::Flavor::$flavor_class" unless $flavor_class =~ s/^\+//;
+    is $config->{class}, $flavor_class;
 
     clear_tempdir;
 }
