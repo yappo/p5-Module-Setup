@@ -27,6 +27,6 @@ do {
     my @data = YAML::Load(join '', $module);
     
     my($packed) = grep { exists $_->{file} && $_->{file} eq 'fujisan.jpg' } @data;
-    my($loader) = grep { exists $_->{file} && $_->{file} eq 'fujisan.jpg' } t::Flavor::Binary->loader;
+    my($loader) = grep { exists $_->{file} && $_->{file} eq 'fujisan.jpg' } t::Flavor::Binary->new->loader;
     is_deeply $packed, $loader;
 };

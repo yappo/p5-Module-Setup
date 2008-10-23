@@ -5,7 +5,7 @@ use base 'Module::Setup::Flavor';
 
 
 sub setup_config {
-    my($class, $context, $config) = @_;
+    my($self, $context, $config) = @_;
 
     my %vcs = (
         SVN => 'VC::SVN',

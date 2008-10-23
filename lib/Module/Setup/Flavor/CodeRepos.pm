@@ -4,8 +4,8 @@ use warnings;
 use base 'Module::Setup::Flavor';
 
 sub loader {
-    my $class = shift;
-    $class->import_template('Module::Setup::Flavor::Default');
+    my $self = shift;
+    $self->import_template('Module::Setup::Flavor::Default');
 }
 
 1;

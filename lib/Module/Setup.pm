@@ -291,9 +291,10 @@ sub create_flavor {
 
     $self->base_dir->set_flavor($name);
     Carp::croak "create flavor: $name exists " if $self->base_dir->flavor->is_exists && !exists $options->{additional};
-    return unless $flavor_class->setup_flavor($self);
+    my $flavor = $flavor_class->new;
+    return unless $flavor->setup_flavor($self);
 
-    my @template = $flavor_class->loader;
+    my @template = $flavor->loader;
     my $config = +{};
     my $additional_config = +{};
     if ($options->{additional}) {
@@ -323,7 +324,7 @@ sub create_flavor {
     $self->base_dir->flavor->additional->config->dump($additional_config);
 
     if ($options->{additional}) {
-        $flavor_class->setup_additional($self, $config);
+        $flavor->setup_additional($self, $config);
         return 1;
     }
 
@@ -336,7 +337,7 @@ sub create_flavor {
     }
     $config->{plugins} ||= [];
 
-    $flavor_class->setup_config($self, $config);
+    $flavor->setup_config($self, $config);
 
     # load plugins
     local $self->{config} = +{

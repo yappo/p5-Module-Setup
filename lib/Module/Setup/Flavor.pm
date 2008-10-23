@@ -6,9 +6,13 @@ use Carp ();
 use Storable ();
 use YAML ();
 
+sub new { bless {}, shift }
+
 my %data_cache;
 sub loader {
-    my $class = shift;
+    my $self = shift;
+    my $class = ref($self);
+    $class = $self unless $class;
 
     unless ($data_cache{$class}) {
         local $/;
@@ -25,14 +29,40 @@ sub loader {
     @{ Storable::dclone($data_cache{$class}) };
 }
 
-sub import_template {
-    my($class, $base_class) = @_;
+sub _import_template {
+    my($self, $base_class, $args) = @_;
 
     eval "require $base_class"; ## no critic
     Carp::croak $@ if $@;
 
     my @base_template  = $base_class->loader;
-    my @local_template = loader($class);
+    my @template;
+ LOOP:
+    for my $tmpl (@base_template) {
+        if (exists $tmpl->{config}) {
+            $args->{template_config} = $tmpl unless $args->{template_config};
+            next;
+        }
+        for my $type (qw/ file plugin dir /) {
+            next unless exists $tmpl->{$type};
+            my $key = "$type - $tmpl->{$type}";
+            next LOOP if $args->{template_loaded}->{$key}++;
+            my $template = delete $args->{template_index}->{$key};
+            $template = $tmpl unless $template;
+            push @template, $template;
+            next LOOP;
+        }
+        push @template, $tmpl;
+    }
+
+    @template;
+}
+
+sub import_template {
+    my($self, @base_classes) = @_;
+    my $class = ref($self);
+
+    my @local_template = loader($self);
 
     my %template_index;
     my $template_config;
@@ -51,27 +81,19 @@ sub import_template {
         $template_index{'anthor - ' . $anthor_key_count++} = $tmpl;
     }
 
+    my $args = {
+        template_config => $template_config,
+        template_index  => \%template_index,
+    };
     my @template;
- LOOP:
-    for my $tmpl (@base_template) {
-        if (exists $tmpl->{config}) {
-            $template_config = $tmpl unless defined $template_config;
-            next;
-        }
-        for my $type (qw/ file plugin dir /) {
-            next unless exists $tmpl->{$type};
-            my $template = delete $template_index{"$type - $tmpl->{$type}"};
-            $template = $tmpl unless $template;
-            push @template, $template;
-            next LOOP;
-        }
-        push @template, $tmpl;
+    for my $base_class (reverse @base_classes) {
+        push @template, $self->_import_template($base_class, $args);
     }
 
-    for my $tmpl (values %template_index) {
+    for my $tmpl (values %{ $args->{template_index} }) {
         push @template, $tmpl;
     }
-    push @template, $template_config if $template_config;
+    push @template, $args->{template_config} if $args->{template_config};
 
     @template;
 }
@@ -79,11 +101,11 @@ sub import_template {
 sub setup_flavor { 1 }
 
 sub setup_config {
-    my($class, $context, $config) = @_;
+    my($self, $context, $config) = @_;
 }
 
 sub setup_additional {
-    my($class, $context, $config) = @_;
+    my($self, $context, $config) = @_;
 }
 
 
