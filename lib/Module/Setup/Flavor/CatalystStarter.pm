@@ -56,6 +56,7 @@ template: |
   name [% cat_name %]
 ---
 file: script/____var-cat_appprefix-var_____server.pl
+chmod: 0700
 template: |
   [% cat_startperl %]
   
@@ -173,6 +174,7 @@ template: |
   =cut
 ---
 file: script/____var-cat_appprefix-var_____cgi.pl
+chmod: 0700
 template: |
   [% cat_startperl %]
   
@@ -213,6 +215,7 @@ template: |
   =cut
 ---
 file: script/____var-cat_appprefix-var_____test.pl
+chmod: 0700
 template: |
   [% cat_startperl %]
   
@@ -269,6 +272,7 @@ template: |
   =cut
 ---
 file: script/____var-cat_appprefix-var_____create.pl
+chmod: 0700
 template: |
   [% cat_startperl %]
   
@@ -346,6 +350,7 @@ template: |
   =cut
 ---
 file: script/____var-cat_appprefix-var_____fastcgi.pl
+chmod: 0700
 template: |
   [% cat_startperl %]
   
@@ -645,6 +650,7 @@ template: |+
   use base 'Module::Setup::Plugin';
   
   use Catalyst::Utils;
+  use Catalyst::Devel;
   use File::Spec;
   use Config;
   
@@ -661,7 +667,7 @@ template: |+
       my $name = $self->distribute->{module};
       $config->{cat_name}      = $name;
       $config->{cat_dir}       = $self->distribute->{dist_path};
-      $config->{cat_script}    = File::Spec->catdir( $config->{dir}, 'script' );
+      $config->{cat_script}    = File::Spec->catdir( $config->{cat_dir}, 'script' );
       $config->{cat_appprefix} = Catalyst::Utils::appprefix($name);
       $config->{cat_appenv}    = Catalyst::Utils::class2env($name);
       $config->{cat_startperl} = "#!$Config{perlpath} -w";
