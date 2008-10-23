@@ -650,6 +650,7 @@ template: |+
   use base 'Module::Setup::Plugin';
   
   use Catalyst::Utils;
+  use Catalyst::Devel;
   use Config;
   
   sub register {
