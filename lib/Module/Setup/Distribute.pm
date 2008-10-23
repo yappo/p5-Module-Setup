@@ -21,7 +21,7 @@ sub new {
 
     $self->{base_path}   = Module::Setup::Path::Dir->new($target, $self->{dist_name});
     $self->{dist_path}   = Module::Setup::Path::Dir->new($target, $self->{dist_name});
-    $self->{module_path} = join '/', @{ $self->{package} };
+    $self->{module_path} = Module::Setup::Path::Dir->new(@{ $self->{package} });
     $self->{additionals} = [];
 
     $self;
