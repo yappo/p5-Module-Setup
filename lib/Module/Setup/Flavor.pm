@@ -115,6 +115,20 @@ sub setup_additional {
 
 Module::Setup::Flavor - Module::Setup Flavor
 
+=head1 Flavor Hook Point
+
+=head2 setup_flavor
+
+flavor setup, if return value is false is exit create flavor
+
+=head1 setup_config
+
+before flavors plugin load
+
+=head1 setup_additional
+
+end of additional flavor install
+
 =cut
 
 __DATA__
