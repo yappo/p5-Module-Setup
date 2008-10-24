@@ -1,4 +1,4 @@
-use t::Utils;
+use Module::Setup::Test::Utils;
 use Test::More tests => 3;
 
 module_setup { flavor_class => '+t::Flavor::Direct', direct => 1, target => 1 }, 'FromDirect';

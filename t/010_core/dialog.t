@@ -1,4 +1,4 @@
-use t::Utils;
+use Module::Setup::Test::Utils;
 use Test::More tests => 5;
 
 my @ans = qw( 1 2 3 4 );

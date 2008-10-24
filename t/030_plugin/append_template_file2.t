@@ -1,4 +1,4 @@
-use t::Utils;
+use Module::Setup::Test::Utils;
 use Test::More tests => 4;
 use Fcntl qw( :mode );
 

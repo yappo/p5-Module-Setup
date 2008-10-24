@@ -1,10 +1,10 @@
-use t::Utils;
+use Module::Setup::Test::Utils;
 use Test::More tests => 5;
 
 
 do {
     module_setup { init => 1 };
-    is t::Utils::context->select_flavor, 'default';
+    is Module::Setup::Test::Utils::context->select_flavor, 'default';
     clear_tempdir;
 };
 
@@ -33,6 +33,6 @@ do {
     };
 
     ok @ans;
-    is t::Utils::context->select_flavor, $selected;
+    is Module::Setup::Test::Utils::context->select_flavor, $selected;
     ok !@ans;
 };

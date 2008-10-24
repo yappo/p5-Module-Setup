@@ -1,4 +1,4 @@
-use t::Utils;
+use Module::Setup::Test::Utils;
 use Test::More tests => 9;
 
 use Module::Setup::Flavor::Default;

@@ -1,4 +1,4 @@
-use t::Utils without_stdout => 1;
+use Module::Setup::Test::Utils without_stdout => 1;
 use Test::More tests => 2;
 use IO::Scalar;
 

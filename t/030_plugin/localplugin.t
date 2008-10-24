@@ -1,4 +1,4 @@
-use t::Utils;
+use Module::Setup::Test::Utils;
 use Test::More tests => 6;
 
 module_setup { flavor_class => '+t::Flavor::LocalPlugin', target => 1 }, 'LocalPlugin';

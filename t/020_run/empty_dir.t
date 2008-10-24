@@ -1,4 +1,4 @@
-use t::Utils;
+use Module::Setup::Test::Utils;
 use Test::More tests => 4;
 
 module_setup { flavor_class => '+t::Flavor::EmptyDir', target => 1 }, 'EmptyDir';

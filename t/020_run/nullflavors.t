@@ -1,4 +1,4 @@
-use t::Utils;
+use Module::Setup::Test::Utils;
 use Test::More tests => 2;
 
 module_setup { flavor_class => '+t::Flavor::Null', target => 1 }, 'Null';
