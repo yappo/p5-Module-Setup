@@ -370,6 +370,7 @@ sub create_skeleton {
         module      => $self->distribute->module,
         dist        => $self->distribute->dist_name,
         module_path => $self->distribute->module_path,
+        module_unix_path => join('/', @{ $self->distribute->package }),
         config      => $config,
         distribute  => $self->distribute,
         localtime   => scalar localtime,

@@ -61,7 +61,7 @@ template: |
   use inc::Module::Install;
   
   name '[% cat_dir %]';
-  all_from '[% cat_path %]';
+  all_from 'lib/[% module_unix_path %].pm';
   
   requires 'Catalyst::Runtime' => '[% cat_catalyst_version %]';
   requires 'Catalyst::Plugin::ConfigLoader';
@@ -712,9 +712,7 @@ template: |+
           cat_catalyst_version => $Catalyst::VERSION,
           cat_rootname         => "$name\::Controller::Root",
           cat_base             => $self->distribute->{dist_path}->absolute,
-          cat_path             => Module::Setup::Path::Dir->new( 'lib', split( '::', $name ) ),
       };
-      $new_config->{cat_path} .= '.pm';
   
       while (my($key, $val) = each %{ $new_config }) {
           $config->{$key} = $val;

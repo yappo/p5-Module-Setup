@@ -60,7 +60,7 @@ template: |
       module_name         => '[% module %]',
       license             => '[% config.plugin_pbp_license %]',
       dist_author         => '[% config.author %] <[% config.email %]>',
-      dist_version_from   => 'lib/[% module_path %].pm',
+      dist_version_from   => 'lib/[% module_unix_path %].pm',
       requires => {
           'Test::More' => 0,
           'version'    => 0,
@@ -79,8 +79,8 @@ template: |+
   WriteMakefile(
       NAME          => '[% module %]',
       AUTHOR        => '[% config.author %] <[% config.email %]>>',
-      VERSION_FROM  => 'lib/[% module_path %].pm',
-      ABSTRACT_FROM => 'lib/[% module_path %].pm',
+      VERSION_FROM  => 'lib/[% module_unix_path %].pm',
+      ABSTRACT_FROM => 'lib/[% module_unix_path %].pm',
       PL_FILES      => {},
       PREREQ_PM     => {
           'Test::More' => 0,

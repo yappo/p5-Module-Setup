@@ -55,7 +55,7 @@ file: Makefile.PL
 template: |
   use inc::Module::Install;
   name '[% dist %]';
-  all_from 'lib/[% module_path %].pm';
+  all_from 'lib/[% module_unix_path %].pm';
 
   # requires '';
 
