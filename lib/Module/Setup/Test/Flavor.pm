@@ -17,7 +17,7 @@ sub import {
         *plan = sub {};
     }
 
-    for my $func (qw/ run_flavor_test name files file dirs options default_dialog dialog /) {
+    for my $func (qw/ run_flavor_test name flavor files file dirs options default_dialog dialog /) {
         no strict 'refs';
         *{"$caller\::$func"} = \&{ $func };
     }

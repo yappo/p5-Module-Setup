@@ -7,6 +7,7 @@ do {
         run_flavor_test {
             default_dialog;
             name 'MyApp';
+            flavor 'Default';
             files qw( .shipit Changes MANIFEST.SKIP README xt/01_podspell.t xt/02_perlcritic.t xt/03_pod.t xt/perlcriticrc );
             file 'Makefile.PL'  => qr!lib/MyApp.pm!;
             file 'lib/MyApp.pm' => qr/package MyApp;/;
