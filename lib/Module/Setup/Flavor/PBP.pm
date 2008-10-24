@@ -11,7 +11,15 @@ PBP - pack from pbp
 
 =head1 SYNOPSIS
 
-  PBP-setup --init --flavor-class=+PBP new_flavor
+  module-setup --init --flavor-class=+PBP new_flavor
+
+=head1 AUTHOR
+
+hidek
+
+=head1 SEE ALSO
+
+L<Module::Starter::PBP>
 
 =cut
 
