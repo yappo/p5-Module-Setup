@@ -30,6 +30,9 @@ my $tests = {};
 sub name ($) {
     $tests->{module} = shift;
 }
+sub flavor ($) {
+    $tests->{flavor_class} = shift;
+}
 
 sub files (@) {
     push @{ $tests->{files} }, @_;
@@ -59,11 +62,13 @@ sub run_flavor_test (&) {
         files   => [],
         dirs    => [],
         options => {},
+        flavor_class => 'Default',
     };
     $code->();
     my $module  = delete $tests->{module};
     my $options = delete $tests->{options};
     $options->{target} = 1;
+    $options->{flavor_class} = delete $tests->{flavor_class};
 
     # test count
     my $count =  2;
