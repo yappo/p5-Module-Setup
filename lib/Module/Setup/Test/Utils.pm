@@ -34,7 +34,7 @@ sub _path_dir (@) {
 }
 my $setup_dir;
 sub setup_dir (@) {
-    $setup_dir ||= File::Temp->newdir;
+    $setup_dir = File::Temp->newdir unless $setup_dir;
     _path_dir($setup_dir, @_);
 }
 sub flavors_dir {
@@ -63,7 +63,7 @@ sub config_file {
 
 my $target_dir;
 sub target_dir (@) {
-    $target_dir ||= File::Temp->newdir;
+    $target_dir = File::Temp->newdir unless $target_dir;
     _path_dir($target_dir, @_);
 }
 
@@ -79,7 +79,7 @@ sub module_setup ($@) {
     my($options, @argv) = @_;
     @argv = @{ $argv[0] } if ref $argv[0] eq 'ARRAY';
 
-    $options->{module_setup_dir} ||= setup_dir;
+    $options->{module_setup_dir} = setup_dir unless $options->{module_setup_dir};
     if ($options->{target}) {
         $options->{target} = target_dir;
     }
@@ -93,10 +93,8 @@ sub module_setup ($@) {
 
 sub dialog (;&) {
     my $code = shift;
-    if (ref $code eq 'CODE') {
-        no warnings 'redefine';
-        *Module::Setup::dialog = $code;
-    }
+    no warnings 'redefine';
+    *Module::Setup::dialog = $code;
 }
 
 sub default_dialog {
