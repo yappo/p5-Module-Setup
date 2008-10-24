@@ -7,12 +7,12 @@ use Path::Class;
 
 sub register {
     my($self, ) = @_;
-    $self->add_trigger( befor_dump_config => \&befor_dump_config );
+    $self->add_trigger( before_dump_config => \&before_dump_config );
     $self->add_trigger( after_setup_module_attribute => sub { shift->SUPER::after_setup_module_attribute(@_) } );
     $self->add_trigger( finish_of_run => \&finish_of_run );
 }
 
-sub befor_dump_config {
+sub before_dump_config {
     my($self, $config) = @_;
 
     $config->{plugin_vc_svk_scratch_repos} ||= '//scratch';

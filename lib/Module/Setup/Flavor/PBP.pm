@@ -343,12 +343,12 @@ template: |+
   sub register {
       my ( $self, ) = @_;
   
-      $self->add_trigger( 'befor_dump_config' => \&befor_dump_config );
+      $self->add_trigger( 'before_dump_config' => \&before_dump_config );
       $self->add_trigger(
           'after_setup_template_vars' => \&after_setup_template_vars );
   }
   
-  sub befor_dump_config {
+  sub before_dump_config {
       my ( $self, $config ) = @_;
   
       $config->{plugin_pbp_license} ||= 'perl';

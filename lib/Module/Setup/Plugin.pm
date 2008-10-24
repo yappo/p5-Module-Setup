@@ -56,7 +56,7 @@ Module::Setup::Plugin - Module::Setup Plugin
 
 =head1 Trigger Point
 
-=head2 befor_dump_config $config
+=head2 before_dump_config $config
 
 config setup L<Module::Setup::Plugin::Config::Basic>
 

@@ -348,7 +348,7 @@ sub create_flavor {
     };
     $self->load_plugins;
 
-    $self->call_trigger( befor_dump_config => $config );
+    $self->call_trigger( before_dump_config => $config );
 
     $self->_clear_triggers;
 
