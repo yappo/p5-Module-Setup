@@ -79,7 +79,7 @@ sub run_flavor_test (&) {
             $count += @{ $test->{likes} };
         }
     }
-    
+
     plan tests => $count;
     module_setup $options, $module;
 

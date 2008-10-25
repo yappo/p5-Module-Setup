@@ -16,8 +16,10 @@ use Getopt::Long;
 use Path::Class;
 use Pod::Usage;
 
+use Module::Setup::Devel;
 use Module::Setup::Distribute;
 use Module::Setup::Path;
+use Module::Setup::Path::Flavor;
 use Module::Setup::Path::Template;
 
 our $HAS_TERM;
@@ -74,6 +76,8 @@ sub setup_options {
         'plugin=s@'                    => \($options->{plugins}),
         'target'                       => \($options->{target}),
         'module-setup-dir'             => \($options->{module_setup_dir}),
+        'devel'                        => \($options->{devel}),
+        'test'                         => \($options->{test}),
         version                        => \&_setup_options_version,
         help                           => \&_setup_options_pod2usage,
     ) or _setup_options_pod2usage;
@@ -122,6 +126,8 @@ sub run {
     $self->_clear_triggers;
 
     $options->{flavor_class} ||= 'Default';
+    return Module::Setup::Devel->new($self)->run if $options->{devel};
+
     $self->setup_base_dir;
 
     if ($options->{init} || (!$options->{pack} && $options->{additional})) {
@@ -420,19 +426,20 @@ sub pack_flavor {
     my $flavor = $config->{flavor};
 
     my $template = [];
-    $self->_collect_flavor_files($template, file   => $self->base_dir->flavor->template);
-    $self->_collect_flavor_files($template, plugin => $self->base_dir->flavor->plugins);
+    my $flavor_dir = exists $config->{flavor_dir} ? Module::Setup::Path::Flavor->new( $config->{flavor_dir} ) : $self->base_dir->flavor;
+    $self->_collect_flavor_files($template, file   => $flavor_dir->template);
+    $self->_collect_flavor_files($template, plugin => $flavor_dir->plugins);
     push @{ $template }, +{
-        config => YAML::LoadFile($self->base_dir->flavor->config->path),
+        config => YAML::LoadFile($flavor_dir->config->path),
     };
 
     unless ($config->{without_additional}) {
         $template = [] if $config->{additional};
-        for my $additional ( $self->base_dir->flavor->additional->path->children ) {
+        for my $additional ( $flavor_dir->additional->path->children ) {
             next unless $additional->is_dir;
             my $name = $additional->dir_list(-1);
             next if $config->{additional} && $name ne $config->{additional};
-            my $base_path = Module::Setup::Path::Template->new($self->base_dir->flavor->additional->path, $name);
+            my $base_path = Module::Setup::Path::Template->new($flavor_dir->additional->path, $name);
 
             my $templates = [];
             $self->_collect_flavor_files($templates, file => $base_path);

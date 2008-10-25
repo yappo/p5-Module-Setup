@@ -21,6 +21,8 @@ run {
         init               => undef,
         additional         => undef,
         without_additional => undef,
+        devel              => undef,
+        test               => undef,
         %{ $block->options || {} },
     };
 
@@ -115,3 +117,12 @@ additional: Add
 --- options
 pack: 1
 without_additional: 1
+
+===
+--- input
+--devel
+--test
+--- argv
+--- options
+devel: 1
+test: 1

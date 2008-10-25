@@ -46,5 +46,16 @@ Options:
     --additional=name          additional template name (use L<Module::Setup::Plugin::Additional>)
     --help                     Show this message
 
+For Devel:
+
+    --devel                    for flavor development
+    --test                     develpoment flavor test
+
+    $ module-setup --devel FlavorClassName  # create skeleton
+    $ cd FlavorClassName
+    $ # edit
+    $ module-setup --devel --test      # flavor test
+    $ module-setup --devel --pack      # flavor packing
+
 =cut
 
