@@ -104,6 +104,18 @@ sub _load_argv {
     }
     $self->options->{$name};
 }
+sub _load_argv_module {
+    my $self = shift;
+    $self->_load_argv( module => '' );
+    Carp::croak "module name is required" unless $self->options->{module};
+    $self->options->{module};
+}
+sub _load_argv_flavor {
+    my $self = shift;
+    $self->_load_argv( flavor => sub { $self->select_flavor } );
+    Carp::croak "flavor name is required" unless $self->options->{flavor};
+    $self->options->{flavor};
+}
 
 sub setup_base_dir {
     my $self = shift;
@@ -135,11 +147,8 @@ sub run {
         return $self->create_flavor;
     }
 
-    $self->_load_argv( module => '' );
-    $self->_load_argv( flavor => sub { $self->select_flavor } );
-
-    Carp::croak "flavor name is required" unless $options->{flavor};
-    Carp::croak "module name is required" unless $options->{module};
+    $self->_load_argv_module;
+    $self->_load_argv_flavor;
     $self->base_dir->set_flavor($options->{flavor});
 
     if ($options->{additional} && !-d $self->base_dir->flavor->additional->path_to($options->{additional})) {

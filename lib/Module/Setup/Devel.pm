@@ -21,6 +21,7 @@ sub run {
     my $self = shift;
 
     return $self->test if $self->context->options->{test};
+    return $self->pack if $self->context->options->{pack};
 
     $self->create_skeleton;
 }
@@ -59,12 +60,19 @@ sub create_skeleton {
     });
 }
 
+sub load_config {
+    my $self = shift;
+    my $conf = YAML::LoadFile('config.yaml');
+    return unless $conf && ref($conf) eq 'HASH' && $conf->{module_setup_flavor_devel};
+    return $conf;
+}
+
 # make t/all.t && --pack && prove t/*t 
 sub test {
     my $self = shift;
 
-    my $conf = YAML::LoadFile('config.yaml');
-    return unless $conf && ref($conf) eq 'HASH' && $conf->{module_setup_flavor_devel};
+    my $conf = $self->load_config;
+    return unless $conf;
     my $distribute = Module::Setup::Distribute->new( $conf->{class}, %{ $self->context->options } );
 
     my @files;my @file;
@@ -110,14 +118,9 @@ TEST__
         no strict 'refs';
         no warnings 'redefine';
 
-        local $self->context->options->{flavor_dir} = '.';
-        local $self->context->options->{flavor}     = 'devel_test_flavor';
-        local $self->context->options->{module}     = $module;
-
         my $pack;
         local *Module::Setup::stdout = sub { $pack = $_[1] };
-        $self->context->pack_flavor;
-
+        $self->pack($module);
         open my $fh, '>', "$module.pm" or die $!;
         print $fh $pack;
         close $fh;
@@ -125,6 +128,25 @@ TEST__
 
     # prove -v
     system 'prove', '-v';
+}
+
+sub pack {
+    my $self = shift;
+
+    my $conf = $self->load_config;
+    return unless $conf;
+
+    my $class;
+    if (@_) {
+        $class = shift;
+    } else {
+        $class = $conf->{class};
+    }
+
+    $self->context->options->{flavor_dir} = '.';
+    $self->context->options->{flavor}     = $class;
+    $self->context->options->{module}     = $class;
+    $self->context->pack_flavor;
 }
 
 1;
