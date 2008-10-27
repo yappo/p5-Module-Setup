@@ -1,5 +1,26 @@
 Revision history for Perl extension Module::Setup
 
+0.06_01 2008-10-27T11:14:39+09:00
+        ** EXPERIMENTAL RELEASE **
+        - Add --devel option
+          $ module-setup --devel New::Flavor
+          $ cd New-Flavor
+            .. edit ..
+          $ module-setup --devel --test
+          $ module-setup --devel --pack > New/Flavor.pm
+          $ module-setup --devel --pack --executable > newflavorsetup.pl
+        - Add --executable option
+          $ module-setup --pack --executable Foo flavor > flavorsetup.pl
+          $ perl ./flavorsetup.pl New::Dist
+        - Add Flavor::CatalystStarter
+        - Add Flavor::PBP
+        - Add Flavor::SelectVC (version control system selector)
+        - Add Module::Setup::Test::Utils and Module::Setup::Test::Flavor
+        - add flavor template macros
+          distribute, module_unix_path
+        - fixed to safe module_path
+        - changed use flavor instance
+
 0.06    2008-10-22T23:02:34+09:00
 	- add Plugin::VC::SVK
         - remove VC::SVN in Flavor::Default config
