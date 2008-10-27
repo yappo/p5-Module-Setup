@@ -7,7 +7,7 @@ use base 'Module::Setup::Flavor::SelectVC';
 
 =head1
 
-PBP - pack from pbp
+PBP - Module::Starter::PBP like flavor
 
 =head1 SYNOPSIS
 
