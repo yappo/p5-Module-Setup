@@ -120,6 +120,7 @@ TEST__
 
         my $pack;
         local *Module::Setup::stdout = sub { $pack = $_[1] };
+        local $self->context->options->{executable};
         $self->pack($module);
         open my $fh, '>', "$module.pm" or die $!;
         print $fh $pack;

@@ -73,6 +73,7 @@ sub setup_options {
         'flavor-class|flavour-class=s' => \($options->{flavor_class}),
         'additional=s'                 => \($options->{additional}),
         'without-additional'           => \($options->{without_additional}),
+        'executable'                   => \($options->{executable}),
         'plugin=s@'                    => \($options->{plugins}),
         'target'                       => \($options->{target}),
         'module-setup-dir'             => \($options->{module_setup_dir}),
@@ -83,7 +84,7 @@ sub setup_options {
     ) or _setup_options_pod2usage;
 
     $self->{options} = $options;
-    $self->{argv}    = \@ARGV;
+    $self->{argv}    = [ @ARGV ];
     $self;
 }
 
@@ -460,9 +461,31 @@ sub pack_flavor {
         }
     }
 
+    my $executable_code;
+    if ($config->{executable}) {
+        $executable_code = <<EXECUTABLE__;
+#!/bin/env perl
+package main;
+use strict;
+use warnings;
+use Module::Setup;
+
+my \$msetup = Module::Setup->new;
+\$msetup->setup_options;
+\$msetup->options->{direct} = 1;
+\$msetup->options->{flavor_class} = '+$config->{module}';
+{
+    no warnings 'redefine';
+    *Module::Setup::_load_flavor_class = sub { '$config->{module}' };
+    \$msetup->run;
+}
+EXECUTABLE__
+    }
+
     my $eq = '=';
     my $yaml = YAML::Dump(@{ $template });
     $self->stdout(<<FLAVOR__);
+$executable_code
 package $module;
 use strict;
 use warnings;
