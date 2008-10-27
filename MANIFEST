@@ -113,4 +113,3 @@ t/Plugin/AppendTemplateFile.pm
 t/Plugin/AppendTemplateFile2.pm
 t/Plugin/AppendTemplateFile2Template.pm
 t/Plugin/Plain.pm
-t/Utils.pm
