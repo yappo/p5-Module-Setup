@@ -8,7 +8,7 @@ do {
 };
 
 do {
-    my $obj = Module::Setup->new( argv => ['', ''], options => { module_setup_dir => setup_dir } );
+    my $obj = Module::Setup->new( argv => ['Foo', ''], options => { module_setup_dir => setup_dir } );
     no warnings 'redefine';
     local *Module::Setup::select_flavor = sub {};
     eval { $obj->run };

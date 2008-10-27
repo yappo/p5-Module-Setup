@@ -461,7 +461,7 @@ sub pack_flavor {
         }
     }
 
-    my $executable_code;
+    my $executable_code = '';
     if ($config->{executable}) {
         $executable_code = <<EXECUTABLE__;
 #!/bin/env perl
