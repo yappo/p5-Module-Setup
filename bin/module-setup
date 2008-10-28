@@ -14,25 +14,25 @@ module-setup - create a skeleton module
 
 =head1 SYNOPSIS
 
-module-setup module_name
+module-setup [options] module_name
 
-module-setup module_name other_flavor_name
+  Examples:
+    module-setup MyApp
 
-module-setup [options]
+    module-setup MyApp other_flavor_name
 
-module-setup --init new_flavor_name
+    module-setup --init new_flavor_name
 
-module-setup --pack MyApp::Flavor::Class flavor_name > MyApp/Flavor/Class.pm
+    module-setup --pack MyApp::Flavor::Class flavor_name > MyApp/Flavor/Class.pm
 
-module-setup --direct MyApp # use Module::Setup::Flavor::Default
-module-setup --direct --flavor-class=+My::Flavor MyApp
+    module-setup --direct MyApp # use Module::Setup::Flavor::Default
+    module-setup --direct --flavor-class=+My::Flavor MyApp
 
-module-setup --additional=DBIC --flavor-class=Additional::Flavor::DBIC default
-module-setup --pack --additional=DBIC MyFlavorCatalystDBIC catalyst > MyFlavorCatalystDBIC.pm
-module-setup --pack --without-additional MyFlavorCatalyst catalyst > MyFlavorCatalyst.pm
+    module-setup --additional=DBIC --flavor-class=Additional::Flavor::DBIC default
+    module-setup --pack --additional=DBIC MyFlavorCatalystDBIC catalyst > MyFlavorCatalystDBIC.pm
+    module-setup --pack --without-additional MyFlavorCatalyst catalyst > MyFlavorCatalyst.pm
 
-Options:
-
+  Options:
     --init                     Create new flavor
     --pack                     Pack flavor
       --without-additional     without additional template in pack
@@ -46,8 +46,7 @@ Options:
     --additional=name          additional template name (use L<Module::Setup::Plugin::Additional>)
     --help                     Show this message
 
-For Devel:
-
+  For Devel:
     --devel                    for flavor development
       --test                   develpoment flavor test
       --pack                   create flavor module file
