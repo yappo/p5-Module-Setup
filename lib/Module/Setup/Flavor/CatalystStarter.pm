@@ -305,7 +305,7 @@ template: |
   
   my $helper = Catalyst::Helper->new( { '.newfiles' => !$force, mech => $mech } );
   
-  pod2usage(1) unless $helper->mk_component( 'MyApp', @ARGV );
+  pod2usage(1) unless $helper->mk_component( '[% cat_name %]', @ARGV );
   
   1;
   
