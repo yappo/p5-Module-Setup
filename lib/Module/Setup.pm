@@ -390,6 +390,7 @@ sub create_skeleton {
         config      => $config,
         distribute  => $self->distribute,
         localtime   => scalar localtime,
+        moniker     => $self->distribute->package->[ scalar(@{ $self->distribute->package })-1 ],
     };
     $self->call_trigger( after_setup_template_vars => $template_vars);
     $self->{distribute}->set_template_vars($template_vars);
