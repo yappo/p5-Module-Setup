@@ -56,3 +56,4 @@ __DATA__
   pm_to_blib
   MANIFEST
   Makefile.old
+  nytprof.out
