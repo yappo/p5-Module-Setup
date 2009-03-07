@@ -141,6 +141,8 @@ template: |
   ^[^/]+\.yaml$
   ^[^/]+\.pl$
   ^\.shipit$
+  ^\.git/
+  \.sw[po]$
 ---
 file: README
 template: |
