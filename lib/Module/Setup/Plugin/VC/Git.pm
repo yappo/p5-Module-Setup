@@ -57,3 +57,5 @@ __DATA__
   MANIFEST
   Makefile.old
   nytprof.out
+  MANIFEST.bak
+  *.sw[po]
