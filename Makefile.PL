@@ -19,6 +19,7 @@ requires 'Scalar::Util';
 requires 'Storable';
 requires 'Template'        => 2.20;
 requires 'YAML';
+requires 'Module::Install::Repository';
 
 # for author_tests in Flavor::Default
 requires 'Module::Install::AuthorTests';

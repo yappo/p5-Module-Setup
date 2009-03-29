@@ -30,6 +30,7 @@ template: |
   author_tests 'xt';
 
   build_requires 'Test::More';
+  auto_set_repository;
   use_test_base;
   auto_include;
   WriteAll;
