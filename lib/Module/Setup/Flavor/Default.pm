@@ -179,7 +179,6 @@ file: .shipit
 chmod: 0644
 template: |
   steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
-  svk.tagpattern = release-%v
 ---
 config:
   plugins:
