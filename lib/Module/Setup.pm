@@ -637,12 +637,16 @@ if incorporating Module::Setup in your application, you can make Helper which is
 =head1 Example For Incorporating
 
   use Module::Setup;
-  my $pmsetup = Module::Setup->new;
+
   local $ENV{MODULE_SETUP_DIR} = '/tmp/module-setup'; # dont use  ~/.module-setup directory
   my $options = {
       # see setup_options method
   };
-  $pmsetup->run($options, [qw/ New::Module foo_flavor /]); # create New::Module module with foo_flavor flavor
+  my $pmsetup = Module::Setup->new(
+      options => $options,
+      argv    => [qw/ New::Module foo_flavor /],
+  );
+  $pmsetup->run; # create New::Module module with foo_flavor flavor
 
 =head1 AUTHOR
 
