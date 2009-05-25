@@ -1,0 +1,242 @@
+=encoding utf8
+
+=head1 NAME
+
+antipop 式 Module::Setup 勉強帖
+
+=head1 DESCRIPTION
+
+yappo が Module::Setup の実装内容を忘れかけてるので antipop 式勉強法で実装内容を勉強するドキュメントだよ。
+
+=head1 用語
+
+Module::Setup で頻繁に出てくる用語の定義
+
+=head2 flavor
+
+フレーバー flavour じゃないのに深い意味は無い。
+
+module-setup コマンドでファイル構造を作るときの大元となるテンプレート群の事を flavor と呼ぶ。
+
+=head2 skeleton
+
+module-setup New::Module コマンド等で flavor から作られたファイル構造の事を skeleton と呼ぶ。
+
+=head2 global_config
+
+~/.module-setup/config.yaml にある、全 flavor で利用される config
+
+=head2 global_plugins
+
+~/.module-setup/plugins 以下にある、全 flavor で利用される plugin
+
+=head2 pack
+
+~/.module-setup/flavors/foo 以下に展開されてる flavor のテンプレートファイル群を、持ち運びし易いように一つの package file にまとめる事や、纏まったファイルの事。
+
+pack_flavor などなど。
+
+=head2 additional
+
+~/.module-setup/flavors/foo 以下に flavor template を展開した後に、さらに別の flavor.pm を、その foo flavor に追加する事が出来る。
+
+使う為には config.yaml にて Plugin::Additional を使うようにしておく。
+
+=head1 パラメータ等
+
+=head2 .module-setup ディレクトリの場所
+
+コマンドラインでは
+
+  module-setup --module-setup-dir=/foo/bar
+
+組み込みでは
+
+  my $pmsetup = Module::Setup->new(
+      options => {
+          module_setup_dir => '/foo/bar',
+      },
+      argv    => [qw/ New::Module foo_flavor /],
+  );
+
+環境変数では
+
+  $ENV{MODULE_SETUP_DIR} = '/foo/var'
+
+とする。
+
+=head1 ファイルパスの扱い
+
+module-setup でよく使われるファイルやディレクトリは Module::Setup::Path 以下の名前空間のモジュールにて処理できる。
+
+基本的な処理は Module::Setup::Path::Base で実装されており、 path_to やら file を探したり、そのPath存在チェックなどである。
+
+=head2 Path
+
+基幹的なディレクトリ ~/.module-setup を表す。
+中には Flavors, Plugins, Config が含まれている。
+
+=head2 Config
+
+設定ファイルのload/save処理
+
+=head2 Dir
+
+Path:Class::Dir + 拡張された mkdpath が実装されている。
+
+=head2 File
+
+Path::Class::File を継承している
+
+=head2 Flavor
+
+~/.module-setup/flavors/foo の foo 以下を表す
+
+Config, Template, Plugins, Additional を含んでいる
+
+=head2 Flavors
+
+=head2 Additional
+
+=head2 Template
+
+Flavor に属してる
+
+~/.module-setup/flavors/foo/template
+
+=head2 Plugins
+
+Flavor に属してる
+
+~/.module-setup/flavors/foo/plugins
+
+
+=head1 プラグイン
+
+プラグインとは Module::Setup::Plugin な名前空間で提供される hook point に応じて様々な処理を行える。詳しい hook points は L<Module::Setup::Plugin> 見た方が速い。
+
+~/.module-setup/config.yaml の plugin セクションに書くと、flavor, skeleton を作る時には必ずloadされる用になる。
+
+global な config とは別に flavor 内の ~/.module-setup/flavors/foo/config.yaml に書くと、そのflavorを処理するときだけloadされる。
+
+
+=head1 テンプレートの継承
+
+  package Module::Setup::Flavor::CodeRepos;
+  use strict;
+  use warnings;
+  use base 'Module::Setup::Flavor';
+  sub loader {
+      my $self = shift;
+      $self->import_template('Module::Setup::Flavor::Default');
+  }
+  1;
+
+のようなコードを書く事で、この場合だと Module::Setup::Flavor::Default を継承した flavor を作る事ができる。
+
+template が入ってる DATA セクションでは、親の flavor template に Unified な patch をあてられるようになった。
+その場合は Patch をあてたい file section に template ではなくて patch という key でパッチを記述する。
+
+追加変更があるテンプレートだけ記述する事が可能。
+
+
+=head1 モジュール別の役割説明
+
+=head2 Module::Setup
+
+module-setup コマンドが使ったり組み込み用途で使う物ですね。
+
+=head3 起動フェーズ
+
+  Module::Setup->new->setup_options->run;
+
+の通り、 new で instance 作って setup_options でコマンドラインオプションを解釈して run で処理を実行します。
+
+組み込みの場合は setup_options を呼ばずに直接 run するんだけど、その場合は new に options と args を渡す必要がある。
+
+  # module-setup New::Module foo_flavor 相当の組み込みコード
+  my $pmsetup = Module::Setup->new(
+      options => {
+          # ここに GetOptions で取得するべきパラメータを入れる
+      },
+      argv    => [qw/ New::Module foo_flavor /], # ここは GetOptions で取れなかった残りかすをいれる。
+  );
+  $pmsetup->run; # create New::Module module with foo_flavor flavor
+
+=head3 pack_flavor
+
+指定した flavor を指定した package name で pack する。
+
+=head2 Module::Setup::Devel
+
+module-setup コマンドから flavor を開発する為に用意された機能がまとまっている。
+flavorのディレクトリ構成の作成、テスト、pack化までを一元で行う。
+
+=head3 create flavor
+
+  module-setup --devel FlavorName
+
+で、 FlavorName という flavor を作る事ができる。
+
+  cd FlavorName
+
+して、ディレクトリ移動して、flavorの作成を行う。
+
+=head3 test flavor
+
+flavor のディレクトリの root にて
+
+  module-setup --devel --test
+
+とすると、 t/all.t を自動的に作って、意図した flavor が作れてるかテスト出来る。
+テストを行うには config.yaml を編集する。
+
+作り立ての flavor には
+
+  ---
+  class: FlavorClassName
+  module_setup_flavor_devel: 1plugins: []
+  testdata:
+    dirs:
+      - testdir
+    files:
+      - file: testfile.txt
+        likes:
+          - hel+options
+          - FlavorClassName 
+   module: MyApp
+
+となってるので、 testdata 以下を編集してテストケースを追加する。
+
+config->{testdata}->{dirs} は、 flavor にて作られるディレクトリを指定する。
+
+config->{testdata}->{files} は、flavor にて作られるファイルを指定する。
+
+config->{testdata}->{files}->[]->{file} に、作成されるファイル名を
+
+@{ config->{testdata}->{files}->[]->{likes} } に、そのファイルの中に出てくる文字列の正規表現を入れます。これは複数個入れらます。
+
+dirs と files は、 flavor で作成される物と完全に一致しないとテストが性交しません。このテストの実装は Module::Setup::Test::Flavor にてされてます。
+
+=head3 pack flavor
+
+現在の編集中の flavor をその場で pack できます。
+
+  module-setup --devel --pack
+
+単独実行可能形式にするには下記のとおり。
+
+  module-setup --devel --pack --executable
+
+
+=head2 Module::Setup::Distribute
+
+与えられた flavor template を元に skeleton を作成する。
+1 file/dir ごとに作る。
+
+=head2 Module::Setup::Path
+
+file path 周りを扱う
+
+=cut
+

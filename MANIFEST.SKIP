@@ -18,3 +18,4 @@
 ^[^/]+\.pl$
 ^\.shipit$
 ^cover_db_view
+^MEMOja.pod
