@@ -158,4 +158,4 @@ __END__
 
 Module::Setup::Devel - for --devel option 
 
-==cut
+=cut
