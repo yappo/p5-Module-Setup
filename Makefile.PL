@@ -21,6 +21,8 @@ requires 'Template'        => 2.20;
 requires 'YAML';
 requires 'Module::Install::Repository';
 
+requires 'Text::Patch';
+
 # for author_tests in Flavor::Default
 requires 'Module::Install::AuthorTests';
 
