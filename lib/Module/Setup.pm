@@ -650,7 +650,7 @@ if incorporating Module::Setup in your application, you can make Helper which is
 
 =head1 AUTHOR
 
-Kazuhiro Osawa E<lt>ko@yappo.ne.jpE<gt>
+Kazuhiro Osawa E<lt>yappo <at> shibuya <döt> plE<gt>
 
 walf443
 
