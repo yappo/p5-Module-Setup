@@ -129,11 +129,11 @@ Module::Setup::Flavor - Module::Setup Flavor
 
 flavor setup, if return value is false is exit create flavor
 
-=head1 setup_config
+=head2 setup_config
 
 before flavors plugin load
 
-=head1 setup_additional
+=head2 setup_additional
 
 end of additional flavor install
 
