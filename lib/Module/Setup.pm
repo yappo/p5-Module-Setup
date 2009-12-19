@@ -561,6 +561,11 @@ sub system {
     CORE::system(@args);
 }
 
+sub shell {
+    my($self, $cmd) = @_;
+    `$cmd`;
+}
+
 1;
 __END__
 
