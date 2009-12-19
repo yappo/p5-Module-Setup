@@ -73,16 +73,17 @@ sub finalize_create_skeleton {
             return;
         }
 
+        !$self->system('perl', 'Makefile.PL') or die $?;
+        !$self->system('make', 'test')        or die $?;
+        !$self->system('make', 'distclean')   or die $?;
+        unless (-d '.git') {
+            !$self->system('git', 'init')                           or die $?;
+            !$self->system('git', 'add', '.')                       or die $?;
+            !$self->system('git', 'commit', '-m', 'initial commit') or die $?;
+        }
+        !$self->system('git', 'remote', 'add', 'origin', "git\@github.com:${user}/${name}.git") or die $?;
+
         if ($self->dialog("try git push to GitHub? [Yn] ", 'y') =~ /[Yy]/) {
-            !$self->system('perl', 'Makefile.PL') or die $?;
-            !$self->system('make', 'test')        or die $?;
-            !$self->system('make', 'distclean')   or die $?;
-            unless (-d '.git') {
-                !$self->system('git', 'init')                           or die $?;
-                !$self->system('git', 'add', '.')                       or die $?;
-                !$self->system('git', 'commit', '-m', 'initial commit') or die $?;
-            }
-            !$self->system('git', 'remote', 'add', 'origin', "git\@github.com:${user}/${name}.git") or die $?;
             !$self->system('git', 'push', 'origin', 'master') or die $?;
         }
     }
