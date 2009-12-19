@@ -3,7 +3,6 @@ Revision history for Perl extension Module::Setup
 0.07    2009-12-19T20:22:02+09:00
         - added Flavor::GitHub
         - added Flavor::XS
-        - added Flavor::
         - Flavor::Default
           use Module::Install::Repository on Makefile.PL
           remove Test::Base dependency
@@ -12,6 +11,7 @@ Revision history for Perl extension Module::Setup
         - Flavor::CatalystStarter
           fiexd script/myapp_create.pl bug
         - Core
+          added Helper support
           added shell method
           fixed module-setup usage
           fixed documentation for Module/Setup.pm
