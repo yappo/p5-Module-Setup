@@ -18,4 +18,4 @@
 ^[^/]+\.pl$
 ^\.shipit$
 ^cover_db_view
-^\.git/
+^\.git

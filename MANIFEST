@@ -8,6 +8,8 @@ inc/Module/Install/Fetch.pm
 inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/Scripts.pm
 inc/Module/Install/TestBase.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
@@ -17,6 +19,7 @@ inc/Test/Base/Filter.pm
 inc/Test/Builder.pm
 inc/Test/Builder/Module.pm
 inc/Test/More.pm
+inc/Test/Requires.pm
 lib/Module/Setup.pm
 lib/Module/Setup/Devel.pm
 lib/Module/Setup/Distribute.pm
@@ -24,8 +27,11 @@ lib/Module/Setup/Flavor.pm
 lib/Module/Setup/Flavor/CatalystStarter.pm
 lib/Module/Setup/Flavor/CodeRepos.pm
 lib/Module/Setup/Flavor/Default.pm
+lib/Module/Setup/Flavor/GitHub.pm
 lib/Module/Setup/Flavor/PBP.pm
 lib/Module/Setup/Flavor/SelectVC.pm
+lib/Module/Setup/Flavor/XS.pm
+lib/Module/Setup/Helper.pm
 lib/Module/Setup/Path.pm
 lib/Module/Setup/Path/Additional.pm
 lib/Module/Setup/Path/Base.pm
@@ -39,6 +45,8 @@ lib/Module/Setup/Path/Template.pm
 lib/Module/Setup/Plugin.pm
 lib/Module/Setup/Plugin/Additional.pm
 lib/Module/Setup/Plugin/Config/Basic.pm
+lib/Module/Setup/Plugin/Helper.pm
+lib/Module/Setup/Plugin/Site/GitHub.pm
 lib/Module/Setup/Plugin/Template.pm
 lib/Module/Setup/Plugin/Test/Makefile.pm
 lib/Module/Setup/Plugin/VC/Git.pm
@@ -48,6 +56,7 @@ lib/Module/Setup/Test/Flavor.pm
 lib/Module/Setup/Test/Utils.pm
 Makefile.PL
 MANIFEST			This list of files
+MEMOja.pod
 META.yml
 README
 t/00_compile.t
@@ -84,13 +93,19 @@ t/030_plugin/illegalplugin.t
 t/030_plugin/illegalpluginconfig.t
 t/030_plugin/localplugin.t
 t/030_plugin/plain.t
+t/030_plugin/site_github.t
 t/030_plugin/template.t
 t/030_plugin/test_makefile.t
 t/030_plugin/vc_git.t
 t/030_plugin/vc_svk.t
 t/030_plugin/vc_svn.t
+t/040_flavor/coderepos.t
 t/040_flavor/default-setup_config.t
 t/040_flavor/default.t
+t/040_flavor/github.t
+t/050_helper/basic-callback.t
+t/050_helper/basic-foo.t
+t/050_helper/basic.t
 t/Flavor/Additional.pm
 t/Flavor/Binary.pm
 t/Flavor/Direct.pm
@@ -108,6 +123,9 @@ t/Flavor/LocalPlugin.pm
 t/Flavor/Null.pm
 t/Flavor/Simple.pm
 t/Flavor/WithAdditional.pm
+t/Helper/Basic.pm
+t/Helper/Basic/Callback.pm
+t/Helper/Basic/Foo.pm
 t/Plugin/AdditionalCheck.pm
 t/Plugin/AppendTemplateFile.pm
 t/Plugin/AppendTemplateFile2.pm

@@ -3,7 +3,7 @@ package Module::Setup;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '0.06_01';
+our $VERSION = '0.07';
 
 use Carp ();
 use Class::Trigger;
