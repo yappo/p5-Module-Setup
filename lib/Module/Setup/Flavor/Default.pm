@@ -87,7 +87,6 @@ template: |
 file: lib/____var-module_path-var____.pm
 template: |
   package [% module %];
-
   use strict;
   use warnings;
   our $VERSION = '0.01';

@@ -24,7 +24,7 @@ __DATA__
 
 file: lib/____var-module_path-var____.pm
 patch: |
-  @@ -25,6 +25,13 @@
+  @@ -24,6 +24,13 @@
    
    =head1 SEE ALSO
    
