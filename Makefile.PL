@@ -30,6 +30,7 @@ tests 't/*.t t/*/*.t';
 
 test_requires 'IO::Scalar';
 test_requires 'Test::More';
+test_requires 'Test::Requires';
 
 use_test_base;
 auto_include;
