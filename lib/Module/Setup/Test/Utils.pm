@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 use File::Temp;
-use Path::Class;
 
 use Module::Setup;
 
@@ -33,7 +32,7 @@ sub import {
 }
 
 sub _path_dir (@) {
-    Path::Class::Dir->new(@_);
+    Module::Setup::Path::Dir->new(@_);
 }
 my $setup_dir;
 sub setup_dir (@) {

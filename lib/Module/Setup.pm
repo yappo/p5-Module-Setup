@@ -13,7 +13,6 @@ use File::HomeDir;
 use File::Path;
 use File::Temp;
 use Getopt::Long;
-use Path::Class;
 use Pod::Usage;
 
 use Module::Setup::Devel;
@@ -124,7 +123,7 @@ sub setup_base_dir {
     if ($self->options->{direct}) {
         $path = File::Temp->newdir;
     } else {
-        $path = $self->options->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || Path::Class::Dir->new(File::HomeDir->my_home, '.module-setup');
+        $path = $self->options->{module_setup_dir} || $ENV{MODULE_SETUP_DIR} || Module::Setup::Path::Dir->new(File::HomeDir->my_home, '.module-setup');
     }
     die 'module_setup directory was not able to be discovered.' unless $path;
 

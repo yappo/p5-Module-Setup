@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use base 'Module::Setup::Path::Base';
 
-use Path::Class;
-
 use Module::Setup::Path::Config;
 use Module::Setup::Path::Flavor;
 use Module::Setup::Path::Flavors;

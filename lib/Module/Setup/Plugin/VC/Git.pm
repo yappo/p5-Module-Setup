@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use base 'Module::Setup::Plugin';
 
-use Path::Class;
-
 sub register {
     my($self, ) = @_;
     $self->add_trigger( check_skeleton_directory => \&check_skeleton_directory );
@@ -18,7 +16,7 @@ sub check_skeleton_directory {
     !$self->system('git', 'init')              or die $?;
     !$self->system('git', 'add', '.gitignore') or die $?;
 
-    my $dir = Path::Class::Dir->new('.');
+    my $dir = Module::Setup::Path::Dir->new('.');
     while (my $path = $dir->next) {
         next if $path eq '.' || $path eq '..' || $path eq '.git';
         $self->system('git', 'add', $path);

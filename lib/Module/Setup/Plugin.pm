@@ -2,7 +2,6 @@ package Module::Setup::Plugin;
 use strict;
 use warnings;
 
-use Path::Class;
 use Scalar::Util qw(weaken);
 
 use Module::Setup::Flavor;
@@ -103,8 +102,6 @@ last hook of run method L<Module::Setup::Plugin::VC::SVK>
   use strict;
   use warnings;
   use base 'Module::Setup::Plugin';
-
-  use Path::Class;
 
   sub register {
       my($self, ) = @_;

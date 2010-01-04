@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use base 'Module::Setup::Plugin::VC::SVN';
 
-use Path::Class;
-
 sub register {
     my($self, ) = @_;
     $self->add_trigger( before_dump_config => \&before_dump_config );
