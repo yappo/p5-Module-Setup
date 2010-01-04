@@ -7,6 +7,9 @@ use Path::Class;
 
 use Module::Setup;
 
+# chdir HOME to avoid "Cannot remove current directory" warning
+END{ chdir }
+
 my $stdout = [];
 sub stdout { $stdout }
 
