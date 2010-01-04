@@ -5,6 +5,11 @@ use base 'Path::Class::Dir';
 
 use Module::Setup;
 
+sub stringify {
+    my($self) = @_;
+    return $self->{__stringify_cache} ||= $self->SUPER::stringify;
+}
+
 sub mkpath {
     my $self  = shift;
     Module::Setup::log($self, "Creating directory $self");
