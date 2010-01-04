@@ -36,7 +36,6 @@ sub new {
 
     $args{options} ||= +{};
     $args{argv}    ||= +[];
-    $args{_current_dir} = Cwd::getcwd;
 
     my $self = bless { %args }, $class;
     $self->{_current_dir}  = Cwd::getcwd;
