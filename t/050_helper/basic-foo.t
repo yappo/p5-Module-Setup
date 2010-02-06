@@ -14,4 +14,9 @@ my $setup = t::Helper::Basic::Foo->new(
 $setup->run;
 
 ok -f target_dir->file('simple.txt');
-like target_dir->file('simple.txt')->slurp, qr{Test::App\nTest/App\nFoo::Bar\nFoo/Bar}ms;
+unless ($^O eq 'MSWin32') {
+    like target_dir->file('simple.txt')->slurp, qr{Test::App\nTest/App\nFoo::Bar\nFoo/Bar}ms;
+}
+else {
+    like target_dir->file('simple.txt')->slurp, qr{Test::App\nTest\\App\nFoo::Bar\nFoo/Bar}ms;
+}

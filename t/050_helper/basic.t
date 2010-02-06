@@ -13,4 +13,9 @@ $setup->run;
 
 ok -d target_dir 'Test-App';
 ok -f target_dir('Test-App')->file('simple.txt');
-like target_dir('Test-App')->file('simple.txt')->slurp, qr{Test::App\nTest/App}ms;
+unless ($^O eq 'MSWin32') {
+    like target_dir('Test-App')->file('simple.txt')->slurp, qr{Test::App\nTest/App}ms;
+}
+else {
+    like target_dir('Test-App')->file('simple.txt')->slurp, qr{Test::App\nTest\\App}ms;
+}
