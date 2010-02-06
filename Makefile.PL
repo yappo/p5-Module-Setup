@@ -12,6 +12,7 @@ requires 'File::HomeDir';
 requires 'File::Path';
 requires 'File::Temp'      => 0.20;
 requires 'Getopt::Long';
+requires 'LWP::UserAgent';
 requires 'Module::Collect' => 0.04;
 requires 'Path::Class';
 requires 'Pod::Usage';
