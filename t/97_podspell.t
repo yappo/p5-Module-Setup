@@ -23,3 +23,6 @@ devel
 shibuya
 callback
 GitHub
+typester
+gfx
+charsbar

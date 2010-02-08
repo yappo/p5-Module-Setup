@@ -3,7 +3,7 @@ package Module::Setup;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp ();
 use Class::Trigger;
@@ -660,6 +660,12 @@ walf443
 hidek
 
 tokuhirom
+
+typester
+
+gfx
+
+charsbar
 
 =head1 SEE ALSO
 
