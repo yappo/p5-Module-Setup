@@ -677,9 +677,8 @@ some pmsetup scripts are in a L<http://svn.coderepos.org/share/lang/perl/misc/pm
 
 =head1 REPOSITORY
 
-  svn co http://svn.coderepos.org/share/lang/perl/Module-Setup/trunk Module-Setup
-
-Module::Setup is Subversion repository is hosted at L<http://coderepos.org/share/>.
+  git clone git://github.com/yappo/p5-Module-Setup.git
+Module::Setup is git repository is hosted at L<http://github.com/yappo/p5-Module-Setup>.
 patches and collaborators are welcome.
 
 =head1 LICENSE
