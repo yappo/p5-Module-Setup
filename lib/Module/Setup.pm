@@ -651,6 +651,18 @@ if incorporating Module::Setup in your application, you can make Helper which is
   );
   $pmsetup->run; # create New::Module module with foo_flavor flavor
 
+=head2 Module::Setup::Core
+
+Module::Setup considers as possible that it can use as Helper-toolkit for other applications.
+but Module::Setup has many dependence modules.
+I hear "Module::Setup is very not usefl for my application helper tool, because many dependence." well.
+
+The Core function of Module::Setup is split to another distribution in conclusion.
+The name considered now is Module::Setup::Core.
+It leaves Flavors, Plugins and C<module-setup> script to Module::Setup.
+
+Really required dependence for Core is lessened by this thing.
+
 =head1 AUTHOR
 
 Kazuhiro Osawa E<lt>yappo <at> shibuya <döt> plE<gt>
