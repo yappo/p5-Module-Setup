@@ -663,6 +663,8 @@ It leaves Flavors, Plugins and C<module-setup> script to Module::Setup.
 
 Really required dependence for Core is lessened by this thing.
 
+It develops in L<http://github.com/yappo/p5-Module-Setup-Core> and Module::Setup's core-branch.
+
 =head1 AUTHOR
 
 Kazuhiro Osawa E<lt>yappo <at> shibuya <döt> plE<gt>
