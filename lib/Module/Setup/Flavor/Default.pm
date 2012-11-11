@@ -142,6 +142,7 @@ template: |
   ^\.shipit$
   ^\.git/
   \.sw[po]$
+  ^MYMETA
 ---
 file: README
 template: |
