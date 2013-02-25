@@ -259,7 +259,7 @@ template: |
   
   =head1 AUTHOR
   
-  [% config.authot %]  C<< <[% config.email %]> >>
+  [% config.author %]  C<< <[% config.email %]> >>
   
   
   =head1 LICENCE AND COPYRIGHT
