@@ -1,7 +1,9 @@
 use Module::Setup::Test::Utils;
 use Test::More tests => 21;
+use Config;
 
 module_setup { init => 1 };
+my $make = $Config{make};
 
 dialog {
     my($self, $msg, $default) = @_;
@@ -22,9 +24,9 @@ dialog {
 {
     my @tests = (
         [qw/perl Makefile.PL/],
-        [qw/make test/],
-        [qw/make manifest/],
-        [qw/make distclean/],
+        [$make, 'test'],
+        [$make, 'manifest'],
+        [$make, 'distclean'],
     );
     no warnings 'redefine';
     local *Module::Setup::system = sub {
@@ -39,9 +41,9 @@ dialog {
 {
     my @tests = (
         { cmds => [qw/perl Makefile.PL/], code => 1 },
-        { cmds => [qw/make test/]       , code => 2 },
-        { cmds => [qw/make manifest/]   , code => 3 },
-        { cmds => [qw/make distclean/]  , code => 4 },
+        { cmds => [$make, 'test']       , code => 2 },
+        { cmds => [$make, 'manifest']   , code => 3 },
+        { cmds => [$make, 'distclean']  , code => 4 },
     );
     my @stack_test;
     my @pre_cmds;

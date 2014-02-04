@@ -2,6 +2,7 @@ package Module::Setup::Plugin::Test::Makefile;
 use strict;
 use warnings;
 use base 'Module::Setup::Plugin';
+use Config;
 
 sub register {
     my($self, ) = @_;
@@ -12,10 +13,11 @@ sub check_skeleton_directory {
     my $self = shift;
     return unless $self->dialog("Check Makefile.PL? [Yn] ", 'y') =~ /[Yy]/;
 
+    my $make = $Config{make};
     !$self->system('perl', 'Makefile.PL') or die $?;
-    !$self->system('make', 'test')        or die $?;
-    !$self->system('make', 'manifest')    or die $?;
-    !$self->system('make', 'distclean')   or die $?;
+    !$self->system($make , 'test')        or die $?;
+    !$self->system($make , 'manifest')    or die $?;
+    !$self->system($make , 'distclean')   or die $?;
 }
 
 1;

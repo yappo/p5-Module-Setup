@@ -4,6 +4,7 @@ use warnings;
 use base 'Module::Setup::Plugin';
 use JSON;
 use LWP::UserAgent;
+use Config;
 
 sub register {
     my($self, ) = @_;
@@ -73,9 +74,10 @@ sub finalize_create_skeleton {
             return;
         }
 
+        my $make = $Config{make};
         !$self->system('perl', 'Makefile.PL') or die $?;
-        !$self->system('make', 'test')        or die $?;
-        !$self->system('make', 'distclean')   or die $?;
+        !$self->system($make , 'test')        or die $?;
+        !$self->system($make , 'distclean')   or die $?;
         unless (-d '.git') {
             !$self->system('git', 'init')                           or die $?;
             !$self->system('git', 'add', '.')                       or die $?;
