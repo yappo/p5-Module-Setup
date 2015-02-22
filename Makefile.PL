@@ -1,3 +1,6 @@
+sub use_test_base { warn "Module::Install::TestBase is not installed?" }
+sub auto_set_repository { warn "Module::Install::Repository is not installed?" }
+
 use inc::Module::Install;
 use 5.008001;
 name 'Module-Setup';
@@ -20,7 +23,6 @@ requires 'Scalar::Util';
 requires 'Storable';
 requires 'Template'        => 2.20;
 requires 'YAML';
-requires 'Module::Install::Repository';
 
 requires 'Text::Patch';
 
@@ -32,6 +34,9 @@ tests 't/*.t t/*/*.t';
 test_requires 'IO::Scalar';
 test_requires 'Test::More';
 test_requires 'Test::Requires';
+
+build_requires 'Module::Install::TestBase';
+build_requires 'Module::Install::Repository';
 
 use_test_base;
 auto_include;
